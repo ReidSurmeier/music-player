@@ -162,30 +162,25 @@ button {
   gap: 2px;
   flex-shrink: 0;
 }
+/* Transport buttons — match nagizin button aesthetic exactly */
 .transport-btn {
-  background: none;
-  border: none;
-  border-radius: 4px;
-  padding: 0 4px;
-  font-size: 0.85rem;
-  height: 22px;
   cursor: pointer;
-  color: #333;
-  font-family: inherit;
-  line-height: 1;
+  display: inline-block;
+  background-color: rgb(220, 220, 220);
+  border: 0px solid black;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  height: 20px;
+  font-family: "AUTHENTICSans-Condensed-90", sans-serif;
+  line-height: 1.5;
+  padding: 0px 7px;
+  color: #222;
 }
-.transport-btn:hover { background-color: #e0e0e0; }
+.transport-btn:hover { background-color: #bbb; }
 .transport-btn.play-pause {
-  font-size: 1rem;
-  padding: 0 6px;
   background-color: #222;
   color: white;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0px 9px;
 }
 .transport-btn.play-pause:hover { background-color: #444; }
 

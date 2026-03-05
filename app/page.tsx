@@ -2,6 +2,11 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
+interface SongMeta {
+  album: string | null;
+  year: string | null;
+  label: string | null;
+}
 interface Song {
   arena_id: number;
   title: string;
@@ -10,6 +15,7 @@ interface Song {
   description: string;
   thumbnail: string;
   categories: string[];
+  meta?: SongMeta;
 }
 
 interface Column {
@@ -31,43 +37,32 @@ const LABEL_MAP: Record<string,string> = {
   threewords:"Three Words", twowords:"Two Words", oneword:"One Word",
 };
 
-// Colors sampled from reidsurmeier.garden/fj09304u2.png (IRC client screenshot)
-// Palette: dark purple title, lavender sidebar, IRC username colors (green/red/blue/teal/orange)
+// 10 colors directly from reidsurmeier.garden/fj09304u2.png
+const P = {
+  purple:  "#800080",
+  red:     "#FF0000",
+  blue:    "#0000FF",
+  lavender:"#D4C5F9",
+  cream:   "#F0E8D0",
+  dark:    "#333333",
+  steel:   "#6699CC",
+  orange:  "#FF6600",
+  green:   "#008000",
+  silver:  "#C0C0C0",
+};
 const CAT_BG: Record<string,string> = {
-  edible:     "#CC6600", // IRC orange/brown username
-  fruit:      "#008000", // IRC green username
-  dessert:    "#FF69B4", // emote pink/magenta
-  people:     "#DCD0E8", // sidebar lavender
-  floral:     "#E8E0F0", // light lavender sidebar
-  gemstones:  "#FFD700", // moderator gold icon
-  location:   "#000080", // dark navy blue username
-  alcohol:    "#8FBC8F", // muted IRC green
-  animal:     "#CC6600", // orange/brown
-  plants:     "#008000", // green
-  nature:     "#008080", // teal/cyan username
-  metals:     "#C0C0C0", // tab bar silver gray
-  elements:   "#D4D0C8", // menu bar light gray
-  artifact:   "#F0F0F0", // window off-white
-  fabric:     "#DCD0E8", // lavender
-  time:       "#4B0082", // title bar dark purple (light text needed)
-  mid:        "#800080", // IRC purple username
-  pale:       "#F0F0F0", // window off-white
-  light:      "#FFFFFF", // white
-  dark:       "#3A0066", // deep title-bar purple (light text needed)
-  deep:       "#000080", // dark blue
-  red:        "#CC0000", // IRC red username
-  yellow:     "#FFD700", // gold
-  pink:       "#FF69B4", // pink
-  orange:     "#CC6600", // orange
-  purple:     "#800080", // IRC purple
-  green:      "#008000", // IRC green
-  blue:       "#0000CD", // IRC blue username
-  brown:      "#8B4513", // emote brown hair
-  white:      "#F0F0F0", // off-white
-  gray:       "#A0A0A0", // scrollbar gray
-  threewords: "#E8E0F0", // light lavender
-  twowords:   "#DCD0E8", // lavender
-  oneword:    "#C8C0D8", // slightly deeper lavender
+  edible:    P.orange,  fruit:      P.green,  dessert:   P.cream,
+  people:    P.lavender,floral:     P.lavender,gemstones: P.steel,
+  location:  P.steel,  alcohol:    P.green,  animal:    P.orange,
+  plants:    P.green,  nature:     P.steel,  metals:    P.silver,
+  elements:  P.silver, artifact:   P.cream,  fabric:    P.cream,
+  time:      P.dark,   mid:        P.silver, pale:      P.cream,
+  light:     P.lavender,dark:      P.dark,   deep:      P.blue,
+  red:       P.red,    yellow:     P.orange, pink:      P.lavender,
+  orange:    P.orange, purple:     P.purple, green:     P.green,
+  blue:      P.blue,   brown:      P.orange, white:     P.cream,
+  gray:      P.silver, threewords: P.lavender,twowords: P.steel,
+  oneword:   P.cream,
 };
 
 function catLabel(id: string) {
@@ -75,7 +70,7 @@ function catLabel(id: string) {
 }
 
 // Dark bg colors that need white text on the pill
-const DARK_CATS = new Set(["time","dark","deep","blue","green","location","purple","red","brown","mid"]);
+const DARK_CATS = new Set(["time","dark","deep","blue","green","purple","red"]);
 
 function pillStyle(catId: string, available: boolean): React.CSSProperties {
   if (!available) return {};
@@ -394,7 +389,7 @@ export default function MusicPlayer() {
 
       {/* ── TITLE BAR ─────────────────────────────────────────────── */}
       <section className="titleContainer">
-        <a href="#"><h1>♫⋆｡ Reid's ‧₊˚♪⊹₊⋆ Playlists ˚♬ ﾟ.</h1></a>
+        <a href="#"><h1>♫⋆｡‧₊˚♪⊹₊⋆˚♬ ﾟ.</h1></a>
 
         <button id="toggle-button" onClick={toggleAll}>
           {allOpen ? "Hide All" : "View All"}
@@ -514,9 +509,14 @@ export default function MusicPlayer() {
                         alt={cleanTitle(song.title)}
                         loading="lazy"
                       />
-                      {song.description && (
-                        <figcaption>{song.description.slice(0, 120)}</figcaption>
-                      )}
+                      <figcaption>
+                        {song.meta?.album && <span>{song.meta.album}</span>}
+                        {song.meta?.year && <span> · {song.meta.year}</span>}
+                        {song.meta?.label && <span> · {song.meta.label}</span>}
+                        {!song.meta?.album && !song.meta?.year && !song.meta?.label && (
+                          <span style={{color:"#999"}}>—</span>
+                        )}
+                      </figcaption>
                     </figure>
                   </details>
                 );

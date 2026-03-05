@@ -10,7 +10,12 @@
       "oneword",
       "pale",
       "blue"
-    ]
+    ],
+    "meta": {
+      "album": "Donuts",
+      "year": "2006",
+      "label": "Stones Throw Records LLC"
+    }
   },
   {
     "arena_id": 27663582,
@@ -23,7 +28,12 @@
       "threewords",
       "brown",
       "people"
-    ]
+    ],
+    "meta": {
+      "album": "Kanye West Presents Good Music Cruel Summer",
+      "year": "2012",
+      "label": "Getting Out Our Dreams, Inc./The Island Def Jam Music Group"
+    }
   },
   {
     "arena_id": 38356786,
@@ -36,7 +46,12 @@
       "threewords",
       "time",
       "blue"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 37743825,
@@ -49,7 +64,12 @@
       "threewords",
       "purple",
       "alcohol"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 40007387,
@@ -62,7 +82,12 @@
       "threewords",
       "location",
       "dark"
-    ]
+    ],
+    "meta": {
+      "album": "Los Angeles: Critical Mass",
+      "year": "1998",
+      "label": "Mindspore Records"
+    }
   },
   {
     "arena_id": 40007393,
@@ -75,7 +100,12 @@
       "twowords",
       "brown",
       "people"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 27663577,
@@ -88,7 +118,12 @@
       "oneword",
       "deep",
       "brown"
-    ]
+    ],
+    "meta": {
+      "album": "Donuts",
+      "year": "2006",
+      "label": "Stones Throw Records LLC"
+    }
   },
   {
     "arena_id": 27663575,
@@ -101,7 +136,12 @@
       "threewords",
       "brown",
       "people"
-    ]
+    ],
+    "meta": {
+      "album": "Anthology",
+      "year": "1972",
+      "label": "Metro-Goldwyn-Mayer Studio, Inc."
+    }
   },
   {
     "arena_id": 40007438,
@@ -114,7 +154,12 @@
       "oneword",
       "elements",
       "gemstones"
-    ]
+    ],
+    "meta": {
+      "album": "Mort Aux Vaches",
+      "year": "1999",
+      "label": "Staalplaat"
+    }
   },
   {
     "arena_id": 31727872,
@@ -127,7 +172,12 @@
       "twowords",
       "animal",
       "location"
-    ]
+    ],
+    "meta": {
+      "album": "New Soil (Mixes)",
+      "year": "2003",
+      "label": "SLS"
+    }
   },
   {
     "arena_id": 28800962,
@@ -140,7 +190,12 @@
       "threewords",
       "light",
       "purple"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 31727886,
@@ -153,7 +208,12 @@
       "twowords",
       "deep",
       "people"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "2000",
+      "label": "430 West"
+    }
   },
   {
     "arena_id": 27017127,
@@ -166,7 +226,12 @@
       "threewords",
       "deep",
       "light"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1999",
+      "label": "Trelik"
+    }
   },
   {
     "arena_id": 4336116,
@@ -179,7 +244,12 @@
       "twowords",
       "deep",
       "red"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1996",
+      "label": "Basic Energy"
+    }
   },
   {
     "arena_id": 40007741,
@@ -192,7 +262,12 @@
       "threewords",
       "floral",
       "green"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1993",
+      "label": "Suck Me Plasma"
+    }
   },
   {
     "arena_id": 40007907,
@@ -205,7 +280,12 @@
       "threewords",
       "deep",
       "people"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 40007970,
@@ -218,7 +298,12 @@
       "twowords",
       "alcohol",
       "green"
-    ]
+    ],
+    "meta": {
+      "album": "Simple Things",
+      "year": "2001",
+      "label": "Ultimate Dilemma"
+    }
   },
   {
     "arena_id": 40008045,
@@ -231,7 +316,12 @@
       "twowords",
       "deep",
       "blue"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1997",
+      "label": "Story"
+    }
   },
   {
     "arena_id": 40008061,
@@ -244,7 +334,12 @@
       "threewords",
       "deep",
       "red"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1992",
+      "label": "Logic Records (UK)"
+    }
   },
   {
     "arena_id": 40008076,
@@ -257,7 +352,12 @@
       "twowords",
       "alcohol",
       "green"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1993",
+      "label": "G-Stone Recordings"
+    }
   },
   {
     "arena_id": 40008146,
@@ -270,7 +370,12 @@
       "twowords",
       "metals",
       "dark"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "2001",
+      "label": "Prototype Recordings"
+    }
   },
   {
     "arena_id": 40009878,
@@ -283,7 +388,12 @@
       "oneword",
       "elements",
       "gemstones"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "2002",
+      "label": "Delsin"
+    }
   },
   {
     "arena_id": 40025528,
@@ -296,7 +406,12 @@
       "oneword",
       "blue",
       "people"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 40025559,
@@ -309,7 +424,12 @@
       "threewords",
       "red",
       "time"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 40028965,
@@ -322,7 +442,12 @@
       "threewords",
       "mid",
       "brown"
-    ]
+    ],
+    "meta": {
+      "album": "Extinction Level Event - The Final World Front",
+      "year": "1998",
+      "label": "Elektra"
+    }
   },
   {
     "arena_id": 40097885,
@@ -335,7 +460,12 @@
       "oneword",
       "elements",
       "gray"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "2019",
+      "label": "Body Culture"
+    }
   },
   {
     "arena_id": 40098367,
@@ -348,7 +478,12 @@
       "oneword",
       "animal",
       "red"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1999",
+      "label": "Underground Resistance"
+    }
   },
   {
     "arena_id": 40098376,
@@ -361,7 +496,12 @@
       "oneword",
       "deep",
       "red"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1996",
+      "label": "Harthouse"
+    }
   },
   {
     "arena_id": 40381509,
@@ -374,7 +514,12 @@
       "threewords",
       "deep",
       "time"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 40396571,
@@ -387,7 +532,12 @@
       "twowords",
       "blue",
       "deep"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "2000",
+      "label": "Metalheadz Platinum"
+    }
   },
   {
     "arena_id": 40025318,
@@ -400,7 +550,12 @@
       "oneword",
       "red",
       "people"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "2001",
+      "label": "Toshiba EMI"
+    }
   },
   {
     "arena_id": 40007485,
@@ -413,7 +568,12 @@
       "twowords",
       "purple",
       "nature"
-    ]
+    ],
+    "meta": {
+      "album": "Space 1.8",
+      "year": "2021",
+      "label": "Warp Records"
+    }
   },
   {
     "arena_id": 40418740,
@@ -426,7 +586,12 @@
       "oneword",
       "pale",
       "blue"
-    ]
+    ],
+    "meta": {
+      "album": "portals//polarities",
+      "year": "2022",
+      "label": "Nettwerk"
+    }
   },
   {
     "arena_id": 40418776,
@@ -439,7 +604,12 @@
       "oneword",
       "deep",
       "elements"
-    ]
+    ],
+    "meta": {
+      "album": "Koyote I",
+      "year": "1998",
+      "label": "Recording Industry Association of Korea"
+    }
   },
   {
     "arena_id": 40428709,
@@ -452,7 +622,12 @@
       "threewords",
       "alcohol",
       "location"
-    ]
+    ],
+    "meta": {
+      "album": "The Outernational Sound",
+      "year": "2004",
+      "label": "ESL Music"
+    }
   },
   {
     "arena_id": 40786360,
@@ -465,7 +640,12 @@
       "oneword",
       "purple",
       "nature"
-    ]
+    ],
+    "meta": {
+      "album": "Endlessness",
+      "year": "2024",
+      "label": "Warp Records"
+    }
   },
   {
     "arena_id": 41239662,
@@ -478,7 +658,12 @@
       "threewords",
       "elements",
       "gray"
-    ]
+    ],
+    "meta": {
+      "album": "Young \uc784\ub9c8 MIXTAPE",
+      "year": "2022",
+      "label": "New Wave Seoul"
+    }
   },
   {
     "arena_id": 41444514,
@@ -491,7 +676,12 @@
       "oneword",
       "location",
       "time"
-    ]
+    ],
+    "meta": {
+      "album": "\u6cd5\u9686\u5bfa (H\u014dry\u016bji-Temple)",
+      "year": "1994",
+      "label": "Invictus"
+    }
   },
   {
     "arena_id": 41735218,
@@ -504,7 +694,12 @@
       "twowords",
       "metals",
       "dark"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 41843827,
@@ -517,7 +712,12 @@
       "oneword",
       "brown",
       "mid"
-    ]
+    ],
+    "meta": {
+      "album": "Enter the Wu-Tang (36 Chambers)",
+      "year": "1993",
+      "label": "Loud Records"
+    }
   },
   {
     "arena_id": 41896001,
@@ -530,7 +730,12 @@
       "threewords",
       "people",
       "brown"
-    ]
+    ],
+    "meta": {
+      "album": "Piper Oz the Hound",
+      "year": "2021",
+      "label": "Anthology Recordings LLC"
+    }
   },
   {
     "arena_id": 35925671,
@@ -543,7 +748,12 @@
       "oneword",
       "red",
       "light"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1983",
+      "label": "MIO Records (2)"
+    }
   },
   {
     "arena_id": 41990627,
@@ -556,7 +766,12 @@
       "threewords",
       "deep",
       "alcohol"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 41991040,
@@ -569,7 +784,12 @@
       "threewords",
       "light",
       "purple"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": "1991",
+      "label": "Big Life"
+    }
   },
   {
     "arena_id": 42010480,
@@ -582,7 +802,12 @@
       "threewords",
       "gemstones",
       "metals"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 27663526,
@@ -595,7 +820,12 @@
       "oneword",
       "alcohol",
       "light"
-    ]
+    ],
+    "meta": {
+      "album": "DHL",
+      "year": "2019",
+      "label": "Blonded"
+    }
   },
   {
     "arena_id": 40009897,
@@ -608,7 +838,12 @@
       "threewords",
       "deep",
       "brown"
-    ]
+    ],
+    "meta": {
+      "album": "Junk Science",
+      "year": "1998",
+      "label": "Deconstruction"
+    }
   },
   {
     "arena_id": 42149747,
@@ -621,7 +856,12 @@
       "oneword",
       "green",
       "light"
-    ]
+    ],
+    "meta": {
+      "album": "Nurture",
+      "year": "2021",
+      "label": "Mom + Pop Music"
+    }
   },
   {
     "arena_id": 42245170,
@@ -634,7 +874,12 @@
       "twowords",
       "dark",
       "light"
-    ]
+    ],
+    "meta": {
+      "album": "Textures",
+      "year": "1989",
+      "label": "Virgin"
+    }
   },
   {
     "arena_id": 42249437,
@@ -647,7 +892,12 @@
       "threewords",
       "nature",
       "green"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 42249503,
@@ -660,7 +910,12 @@
       "threewords",
       "deep",
       "elements"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 42249519,
@@ -673,7 +928,12 @@
       "twowords",
       "animal",
       "deep"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 42249606,
@@ -686,7 +946,12 @@
       "threewords",
       "deep",
       "nature"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 42257757,
@@ -699,7 +964,12 @@
       "oneword",
       "elements",
       "deep"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 42258022,
@@ -712,7 +982,12 @@
       "twowords",
       "blue",
       "light"
-    ]
+    ],
+    "meta": {
+      "album": "In Colour",
+      "year": "2015",
+      "label": "Young"
+    }
   },
   {
     "arena_id": 42254218,
@@ -725,7 +1000,12 @@
       "twowords",
       "deep",
       "metals"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 42565322,
@@ -738,7 +1018,12 @@
       "twowords",
       "mid",
       "red"
-    ]
+    ],
+    "meta": {
+      "album": "souljaboytellem.com",
+      "year": "2007",
+      "label": "ColliPark Music"
+    }
   },
   {
     "arena_id": 42870346,
@@ -751,7 +1036,12 @@
       "threewords",
       "deep",
       "elements"
-    ]
+    ],
+    "meta": {
+      "album": null,
+      "year": null,
+      "label": null
+    }
   },
   {
     "arena_id": 43472072,
@@ -764,7 +1054,12 @@
       "threewords",
       "red",
       "time"
-    ]
+    ],
+    "meta": {
+      "album": "Kansas City Suite: The Music of Benny Carter",
+      "year": "1961",
+      "label": "Parlophone Records Ltd"
+    }
   },
   {
     "arena_id": 43472293,
@@ -777,7 +1072,12 @@
       "oneword",
       "animal",
       "purple"
-    ]
+    ],
+    "meta": {
+      "album": "The Hawk Flies High",
+      "year": "2007",
+      "label": "Riverside Records/Fantasy, Inc."
+    }
   },
   {
     "arena_id": 43632935,
@@ -790,6 +1090,11 @@
       "oneword",
       "elements",
       "deep"
-    ]
+    ],
+    "meta": {
+      "album": "oneway",
+      "year": "2018",
+      "label": "truworks records"
+    }
   }
 ]

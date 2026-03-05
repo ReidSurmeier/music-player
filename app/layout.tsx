@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "♫ Reid's Playlists",
+  title: "♫⋆｡‧₊˚♪⊹₊⋆˚♬",
   description: "Reid Surmeier's music player — styled after nagizin.xyz, sourced from Are.na",
 };
 
