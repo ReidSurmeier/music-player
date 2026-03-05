@@ -140,7 +140,7 @@ export default function MusicPlayer() {
 
   // Load songs — no HEAD check, just load all
   useEffect(() => {
-    fetch("/music-player/songs.json")
+    fetch("/songs.json")
       .then(r => r.json())
       .then((data: Song[]) => {
         setSongs(data);
@@ -276,7 +276,7 @@ export default function MusicPlayer() {
     // Setup Web Audio on first interaction (requires user gesture)
     setupAnalyser();
 
-    audio.src = `/music-player/audio/${song.yt_id}.mp3`;
+    audio.src = `/audio/${song.yt_id}.mp3`;
     audio.load();
     audio.play().catch(err => {
       console.warn("Play failed:", err);

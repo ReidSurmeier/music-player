@@ -5,11 +5,11 @@
 
 @font-face {
   font-family: AUTHENTICSans-Condensed-90;
-  src: url(/music-player/fonts/AUTHENTICSans-Condensed-90.woff) format("woff");
+  src: url(/fonts/AUTHENTICSans-Condensed-90.woff) format("woff");
 }
 @font-face {
   font-family: AUTHENTICSans-90;
-  src: url(/music-player/fonts/AUTHENTICSans-90.woff) format("woff");
+  src: url(/fonts/AUTHENTICSans-90.woff) format("woff");
 }
 @font-face {
   font-family: "SpokaHanSansNeo";
