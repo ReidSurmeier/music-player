@@ -7,6 +7,11 @@ interface SongMeta {
   year: string | null;
   label: string | null;
 }
+interface SongGradient {
+  from: string;
+  to: string;
+  hue: number;
+}
 interface Song {
   arena_id: number;
   title: string;
@@ -16,6 +21,7 @@ interface Song {
   thumbnail: string;
   categories: string[];
   meta?: SongMeta;
+  gradient?: SongGradient;
 }
 
 interface Column {
@@ -69,17 +75,23 @@ function catLabel(id: string) {
   return LABEL_MAP[id] || (id.charAt(0).toUpperCase() + id.slice(1));
 }
 
-// Dark bg colors that need white text on the pill
-const DARK_CATS = new Set(["time","dark","deep","blue","green","purple","red"]);
-
-function pillStyle(catId: string, available: boolean): React.CSSProperties {
-  if (!available) return {};
-  const bg = CAT_BG[catId] || "#ddd";
-  const dark = DARK_CATS.has(catId);
-  return {
-    backgroundColor: bg,
-    color: dark ? "#f0f0f0" : "#000",
-  };
+// Per-song gradient: each song gets a unique two-stop gradient
+// Fallback to category color if no gradient stored
+function pillStyle(song: Song, available: boolean): React.CSSProperties {
+  if (!available) return { opacity: 0.4 };
+  if (song.gradient) {
+    const { from, to, hue } = song.gradient;
+    // Use white text for dark hues (purple, blue, green, red ranges)
+    const darkHue = (hue >= 180 && hue <= 320) || hue >= 340 || hue <= 20;
+    const sat = parseInt(from.slice(1,3), 16);
+    const isDark = sat < 130;
+    const grad = "linear-gradient(135deg, " + from + " 0%, " + to + " 100%)";
+    return {
+      background: grad,
+      color: isDark ? "#f5f0e8" : "#1E1814",
+    };
+  }
+  return { backgroundColor: CAT_BG[song.categories?.[0] || "gray"] || "#ddd" };
 }
 
 function cleanTitle(title: string) {
@@ -193,7 +205,8 @@ export default function MusicPlayer() {
       const x = i * (barW + gap);
       const y = H - barH;
       // Color: same IRC dark purple from the palette
-      ctx.fillStyle = val > 0.6 ? "#4B0082" : val > 0.3 ? "#800080" : "#DCD0E8";
+      // G&W color: red peaks, cream mid, dark brown base
+      ctx.fillStyle = val > 0.65 ? "#CC3300" : val > 0.35 ? "#C8B890" : "#6B4030";
       ctx.fillRect(x, y, barW, barH);
     }
 
@@ -491,7 +504,7 @@ export default function MusicPlayer() {
                   <details
                     key={song.yt_id}
                     className={isErr ? "unavailable" : ""}
-                    style={pillStyle(col.id, !isErr)}
+                    style={pillStyle(song, !isErr)}
                     ref={el => { detailsRefs.current[song.yt_id] = el; }}
                   >
                     <summary

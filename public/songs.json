@@ -15,6 +15,11 @@
       "album": "Donuts",
       "year": "2006",
       "label": "Stones Throw Records LLC"
+    },
+    "gradient": {
+      "from": "#d59999",
+      "to": "#cc9065",
+      "hue": 0
     }
   },
   {
@@ -33,6 +38,11 @@
       "album": "Kanye West Presents Good Music Cruel Summer",
       "year": "2012",
       "label": "Getting Out Our Dreams, Inc./The Island Def Jam Music Group"
+    },
+    "gradient": {
+      "from": "#94daa9",
+      "to": "#5ed3b1",
+      "hue": 138
     }
   },
   {
@@ -51,6 +61,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#be8fdf",
+      "to": "#da57da",
+      "hue": 275
     }
   },
   {
@@ -69,6 +84,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#e4d98a",
+      "to": "#b7e150",
+      "hue": 53
     }
   },
   {
@@ -87,6 +107,11 @@
       "album": "Los Angeles: Critical Mass",
       "year": "1998",
       "label": "Mindspore Records"
+    },
+    "gradient": {
+      "from": "#99cbd5",
+      "to": "#6590cc",
+      "hue": 190
     }
   },
   {
@@ -105,6 +130,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#da94ba",
+      "to": "#d35e6d",
+      "hue": 328
     }
   },
   {
@@ -123,6 +153,11 @@
       "album": "Donuts",
       "year": "2006",
       "label": "Stones Throw Records LLC"
+    },
+    "gradient": {
+      "from": "#a3df8f",
+      "to": "#57da6d",
+      "hue": 105
     }
   },
   {
@@ -141,6 +176,11 @@
       "album": "Anthology",
       "year": "1972",
       "label": "Metro-Goldwyn-Mayer Studio, Inc."
+    },
+    "gradient": {
+      "from": "#8e8ae4",
+      "to": "#9350e1",
+      "hue": 243
     }
   },
   {
@@ -159,6 +199,11 @@
       "album": "Mort Aux Vaches",
       "year": "1999",
       "label": "Staalplaat"
+    },
+    "gradient": {
+      "from": "#d5ad99",
+      "to": "#ccb265",
+      "hue": 20
     }
   },
   {
@@ -177,6 +222,11 @@
       "album": "New Soil (Mixes)",
       "year": "2003",
       "label": "SLS"
+    },
+    "gradient": {
+      "from": "#94dac0",
+      "to": "#5eced3",
+      "hue": 158
     }
   },
   {
@@ -195,6 +245,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#d98fdf",
+      "to": "#da57ae",
+      "hue": 295
     }
   },
   {
@@ -213,6 +268,11 @@
       "album": null,
       "year": "2000",
       "label": "430 West"
+    },
+    "gradient": {
+      "from": "#d1e48a",
+      "to": "#86e150",
+      "hue": 73
     }
   },
   {
@@ -231,6 +291,11 @@
       "album": null,
       "year": "1999",
       "label": "Trelik"
+    },
+    "gradient": {
+      "from": "#99b7d5",
+      "to": "#656ecc",
+      "hue": 210
     }
   },
   {
@@ -249,6 +314,11 @@
       "album": null,
       "year": "1996",
       "label": "Basic Energy"
+    },
+    "gradient": {
+      "from": "#da94a3",
+      "to": "#d3775e",
+      "hue": 348
     }
   },
   {
@@ -267,6 +337,11 @@
       "album": null,
       "year": "1993",
       "label": "Suck Me Plasma"
+    },
+    "gradient": {
+      "from": "#8fdf96",
+      "to": "#57da99",
+      "hue": 125
     }
   },
   {
@@ -285,6 +360,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#ac8ae4",
+      "to": "#c350e1",
+      "hue": 263
     }
   },
   {
@@ -303,6 +383,11 @@
       "album": "Simple Things",
       "year": "2001",
       "label": "Ultimate Dilemma"
+    },
+    "gradient": {
+      "from": "#d5c199",
+      "to": "#c3cc65",
+      "hue": 40
     }
   },
   {
@@ -321,6 +406,11 @@
       "album": null,
       "year": "1997",
       "label": "Story"
+    },
+    "gradient": {
+      "from": "#94dad7",
+      "to": "#5ea7d3",
+      "hue": 178
     }
   },
   {
@@ -339,6 +429,11 @@
       "album": null,
       "year": "1992",
       "label": "Logic Records (UK)"
+    },
+    "gradient": {
+      "from": "#df8fcb",
+      "to": "#da5782",
+      "hue": 315
     }
   },
   {
@@ -357,6 +452,11 @@
       "album": null,
       "year": "1993",
       "label": "G-Stone Recordings"
+    },
+    "gradient": {
+      "from": "#b3e48a",
+      "to": "#56e150",
+      "hue": 93
     }
   },
   {
@@ -375,6 +475,11 @@
       "album": null,
       "year": "2001",
       "label": "Prototype Recordings"
+    },
+    "gradient": {
+      "from": "#99a3d5",
+      "to": "#7f65cc",
+      "hue": 230
     }
   },
   {
@@ -393,6 +498,11 @@
       "album": null,
       "year": "2002",
       "label": "Delsin"
+    },
+    "gradient": {
+      "from": "#da9d94",
+      "to": "#d39e5e",
+      "hue": 8
     }
   },
   {
@@ -411,6 +521,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#8fdfb1",
+      "to": "#57dac4",
+      "hue": 145
     }
   },
   {
@@ -429,6 +544,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#ca8ae4",
+      "to": "#e150ce",
+      "hue": 283
     }
   },
   {
@@ -447,6 +567,11 @@
       "album": "Extinction Level Event - The Final World Front",
       "year": "1998",
       "label": "Elektra"
+    },
+    "gradient": {
+      "from": "#d5d599",
+      "to": "#a1cc65",
+      "hue": 60
     }
   },
   {
@@ -465,6 +590,11 @@
       "album": null,
       "year": "2019",
       "label": "Body Culture"
+    },
+    "gradient": {
+      "from": "#94c5da",
+      "to": "#5e80d3",
+      "hue": 198
     }
   },
   {
@@ -483,6 +613,11 @@
       "album": null,
       "year": "1999",
       "label": "Underground Resistance"
+    },
+    "gradient": {
+      "from": "#df8fb0",
+      "to": "#da5857",
+      "hue": 335
     }
   },
   {
@@ -501,6 +636,11 @@
       "album": null,
       "year": "1996",
       "label": "Harthouse"
+    },
+    "gradient": {
+      "from": "#95e48a",
+      "to": "#50e17b",
+      "hue": 113
     }
   },
   {
@@ -519,6 +659,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#a399d5",
+      "to": "#a165cc",
+      "hue": 250
     }
   },
   {
@@ -537,6 +682,11 @@
       "album": null,
       "year": "2000",
       "label": "Metalheadz Platinum"
+    },
+    "gradient": {
+      "from": "#dab494",
+      "to": "#d3c55e",
+      "hue": 28
     }
   },
   {
@@ -555,6 +705,11 @@
       "album": null,
       "year": "2001",
       "label": "Toshiba EMI"
+    },
+    "gradient": {
+      "from": "#8fdfcb",
+      "to": "#57c3da",
+      "hue": 165
     }
   },
   {
@@ -573,6 +728,11 @@
       "album": "Space 1.8",
       "year": "2021",
       "label": "Warp Records"
+    },
+    "gradient": {
+      "from": "#e48ae0",
+      "to": "#e1509e",
+      "hue": 303
     }
   },
   {
@@ -591,6 +751,11 @@
       "album": "portals//polarities",
       "year": "2022",
       "label": "Nettwerk"
+    },
+    "gradient": {
+      "from": "#c1d599",
+      "to": "#7fcc65",
+      "hue": 80
     }
   },
   {
@@ -609,6 +774,11 @@
       "album": "Koyote I",
       "year": "1998",
       "label": "Recording Industry Association of Korea"
+    },
+    "gradient": {
+      "from": "#94aeda",
+      "to": "#645ed3",
+      "hue": 218
     }
   },
   {
@@ -627,6 +797,11 @@
       "album": "The Outernational Sound",
       "year": "2004",
       "label": "ESL Music"
+    },
+    "gradient": {
+      "from": "#df8f95",
+      "to": "#da8357",
+      "hue": 355
     }
   },
   {
@@ -645,6 +820,11 @@
       "album": "Endlessness",
       "year": "2024",
       "label": "Warp Records"
+    },
+    "gradient": {
+      "from": "#8ae49d",
+      "to": "#50e1ab",
+      "hue": 133
     }
   },
   {
@@ -663,6 +843,11 @@
       "album": "Young \uc784\ub9c8 MIXTAPE",
       "year": "2022",
       "label": "New Wave Seoul"
+    },
+    "gradient": {
+      "from": "#b799d5",
+      "to": "#c365cc",
+      "hue": 270
     }
   },
   {
@@ -681,6 +866,11 @@
       "album": "\u6cd5\u9686\u5bfa (H\u014dry\u016bji-Temple)",
       "year": "1994",
       "label": "Invictus"
+    },
+    "gradient": {
+      "from": "#dacc94",
+      "to": "#bad35e",
+      "hue": 48
     }
   },
   {
@@ -699,6 +889,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#8fd8df",
+      "to": "#5798da",
+      "hue": 185
     }
   },
   {
@@ -717,6 +912,11 @@
       "album": "Enter the Wu-Tang (36 Chambers)",
       "year": "1993",
       "label": "Loud Records"
+    },
+    "gradient": {
+      "from": "#e48ac2",
+      "to": "#e1506e",
+      "hue": 323
     }
   },
   {
@@ -735,6 +935,11 @@
       "album": "Piper Oz the Hound",
       "year": "2021",
       "label": "Anthology Recordings LLC"
+    },
+    "gradient": {
+      "from": "#add599",
+      "to": "#65cc6f",
+      "hue": 100
     }
   },
   {
@@ -753,6 +958,11 @@
       "album": null,
       "year": "1983",
       "label": "MIO Records (2)"
+    },
+    "gradient": {
+      "from": "#9497da",
+      "to": "#8b5ed3",
+      "hue": 238
     }
   },
   {
@@ -771,6 +981,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#dfa48f",
+      "to": "#daaf57",
+      "hue": 15
     }
   },
   {
@@ -789,6 +1004,11 @@
       "album": null,
       "year": "1991",
       "label": "Big Life"
+    },
+    "gradient": {
+      "from": "#8ae4bb",
+      "to": "#50e1dc",
+      "hue": 153
     }
   },
   {
@@ -807,6 +1027,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#cb99d5",
+      "to": "#cc65b1",
+      "hue": 290
     }
   },
   {
@@ -825,6 +1050,11 @@
       "album": "DHL",
       "year": "2019",
       "label": "Blonded"
+    },
+    "gradient": {
+      "from": "#d1da94",
+      "to": "#93d35e",
+      "hue": 68
     }
   },
   {
@@ -843,6 +1073,11 @@
       "album": "Junk Science",
       "year": "1998",
       "label": "Deconstruction"
+    },
+    "gradient": {
+      "from": "#8fbddf",
+      "to": "#576cda",
+      "hue": 205
     }
   },
   {
@@ -861,6 +1096,11 @@
       "album": "Nurture",
       "year": "2021",
       "label": "Mom + Pop Music"
+    },
+    "gradient": {
+      "from": "#e48aa4",
+      "to": "#e16350",
+      "hue": 343
     }
   },
   {
@@ -879,6 +1119,11 @@
       "album": "Textures",
       "year": "1989",
       "label": "Virgin"
+    },
+    "gradient": {
+      "from": "#99d599",
+      "to": "#65cc91",
+      "hue": 120
     }
   },
   {
@@ -897,6 +1142,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#a994da",
+      "to": "#b15ed3",
+      "hue": 258
     }
   },
   {
@@ -915,6 +1165,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#dfbe8f",
+      "to": "#d9da57",
+      "hue": 35
     }
   },
   {
@@ -933,6 +1188,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#8ae4d9",
+      "to": "#50b6e1",
+      "hue": 173
     }
   },
   {
@@ -951,6 +1211,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#d599cb",
+      "to": "#cc658f",
+      "hue": 310
     }
   },
   {
@@ -969,6 +1234,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#bada94",
+      "to": "#6cd35e",
+      "hue": 88
     }
   },
   {
@@ -987,6 +1257,11 @@
       "album": "In Colour",
       "year": "2015",
       "label": "Young"
+    },
+    "gradient": {
+      "from": "#8fa3df",
+      "to": "#6e57da",
+      "hue": 225
     }
   },
   {
@@ -1005,6 +1280,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#e48f8a",
+      "to": "#e19450",
+      "hue": 3
     }
   },
   {
@@ -1023,6 +1303,11 @@
       "album": "souljaboytellem.com",
       "year": "2007",
       "label": "ColliPark Music"
+    },
+    "gradient": {
+      "from": "#99d5ae",
+      "to": "#65ccb3",
+      "hue": 140
     }
   },
   {
@@ -1041,6 +1326,11 @@
       "album": null,
       "year": null,
       "label": null
+    },
+    "gradient": {
+      "from": "#c094da",
+      "to": "#d35ecd",
+      "hue": 278
     }
   },
   {
@@ -1059,6 +1349,11 @@
       "album": "Kansas City Suite: The Music of Benny Carter",
       "year": "1961",
       "label": "Parlophone Records Ltd"
+    },
+    "gradient": {
+      "from": "#dfd98f",
+      "to": "#adda57",
+      "hue": 55
     }
   },
   {
@@ -1077,6 +1372,11 @@
       "album": "The Hawk Flies High",
       "year": "2007",
       "label": "Riverside Records/Fantasy, Inc."
+    },
+    "gradient": {
+      "from": "#8ad1e4",
+      "to": "#5085e1",
+      "hue": 193
     }
   },
   {
@@ -1095,6 +1395,11 @@
       "album": "oneway",
       "year": "2018",
       "label": "truworks records"
+    },
+    "gradient": {
+      "from": "#d599b7",
+      "to": "#cc656d",
+      "hue": 330
     }
   }
 ]
