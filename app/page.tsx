@@ -125,6 +125,8 @@ export default function MusicPlayer() {
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const animFrameRef = useRef<number>(0);
+  // Ring buffer of recent waveform snapshots for stacked history viz
+  const waveHistoryRef = useRef<Float32Array[]>([]);
 
   const [songs, setSongs] = useState<Song[]>([]);
   const [columns, setColumns] = useState<Column[]>([]);
@@ -163,8 +165,8 @@ export default function MusicPlayer() {
     try {
       const ctx = new AudioContext();
       const analyser = ctx.createAnalyser();
-      analyser.fftSize = 64;         // 32 frequency bins — Spotify-style bar count
-      analyser.smoothingTimeConstant = 0.8;
+      analyser.fftSize = 2048;        // time-domain waveform
+      analyser.smoothingTimeConstant = 0.5;
       const source = ctx.createMediaElementSource(audio);
       source.connect(analyser);
       analyser.connect(ctx.destination);
@@ -178,57 +180,83 @@ export default function MusicPlayer() {
 
   const drawVisualizer = useCallback(() => {
     const canvas = canvasRef.current;
-    const analyser = analyserRef.current;
-    if (!canvas || !analyser) return;
+    if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const bins = analyser.frequencyBinCount; // 32
-    const data = new Uint8Array(bins);
-    analyser.getByteFrequencyData(data);
-
     const W = canvas.width;
     const H = canvas.height;
+    const N_HISTORY = 10;
+
     ctx.clearRect(0, 0, W, H);
 
-    // Draw ~20 bars in the center frequency range (skip very low/high bins)
-    const start = 2;
-    const end = 22;
-    const count = end - start;
-    const gap = 1;
-    const barW = Math.floor((W - gap * (count - 1)) / count);
+    const analyser = analyserRef.current;
 
-    for (let i = 0; i < count; i++) {
-      const val = data[start + i] / 255;
-      const barH = Math.max(2, Math.round(val * H));
-      const x = i * (barW + gap);
-      const y = H - barH;
-      // Color: same IRC dark purple from the palette
-      // G&W color: red peaks, cream mid, dark brown base
-      ctx.fillStyle = val > 0.65 ? "#CC3300" : val > 0.35 ? "#C8B890" : "#6B4030";
-      ctx.fillRect(x, y, barW, barH);
+    if (analyser) {
+      // Capture current waveform frame
+      const wave = new Float32Array(analyser.fftSize);
+      analyser.getFloatTimeDomainData(wave);
+
+      // Push to ring buffer
+      const hist = waveHistoryRef.current;
+      hist.push(wave);
+      if (hist.length > N_HISTORY) hist.shift();
+
+      // Draw stacked history slices: oldest (most faded) at back, newest at front
+      for (let hi = 0; hi < hist.length; hi++) {
+        const progress = hi / Math.max(hist.length - 1, 1); // 0=oldest → 1=newest
+        // Very low opacity overall, newest slice slightly more visible
+        const opacity = 0.04 + progress * 0.22;
+        // Slight vertical stack offset (pseudo-3D depth)
+        const yShift = (hist.length - 1 - hi) * 1.2;
+
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(248, 244, 228, ${opacity})`;
+        ctx.lineWidth = progress > 0.8 ? 1.2 : 0.9;
+
+        const slice = hist[hi];
+        const step = Math.ceil(slice.length / W);
+        for (let x = 0; x < W; x++) {
+          let sum = 0;
+          for (let s = 0; s < step; s++) sum += (slice[x * step + s] ?? 0);
+          const sample = sum / step;
+          const y = H / 2 + sample * (H / 2) * 0.82 + yShift;
+          x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+    } else {
+      // Idle: gentle drifting cosine — cream white, very low opacity
+      const t = Date.now() / 4000;
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(248, 244, 228, 0.10)";
+      ctx.lineWidth = 1;
+      for (let x = 0; x < W; x++) {
+        const phase = (x / W) * Math.PI * 3 + t;
+        const y = H / 2 + Math.sin(phase) * H * 0.18 + Math.sin(phase * 0.5) * H * 0.08;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      // Second faint layer shifted
+      ctx.beginPath();
+      ctx.strokeStyle = "rgba(248, 244, 228, 0.05)";
+      for (let x = 0; x < W; x++) {
+        const phase = (x / W) * Math.PI * 2.3 + t * 0.7 + 1.2;
+        const y = H / 2 + Math.sin(phase) * H * 0.12;
+        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+      ctx.stroke();
     }
 
     animFrameRef.current = requestAnimationFrame(drawVisualizer);
   }, []);
 
-  // Start/stop draw loop with playback state
+  // Draw loop always runs — shows idle wave when nothing plays, live waveform when playing
   useEffect(() => {
-    if (isPlaying && analyserRef.current) {
-      // Resume AudioContext if suspended (browser policy)
-      audioCtxRef.current?.resume();
-      cancelAnimationFrame(animFrameRef.current);
-      animFrameRef.current = requestAnimationFrame(drawVisualizer);
-    } else {
-      cancelAnimationFrame(animFrameRef.current);
-      // Draw flat line when paused
-      const canvas = canvasRef.current;
-      if (canvas) {
-        const ctx = canvas.getContext("2d");
-        ctx?.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    }
+    if (isPlaying) audioCtxRef.current?.resume();
+    cancelAnimationFrame(animFrameRef.current);
+    animFrameRef.current = requestAnimationFrame(drawVisualizer);
     return () => cancelAnimationFrame(animFrameRef.current);
   }, [isPlaying, drawVisualizer]);
 
@@ -417,16 +445,12 @@ export default function MusicPlayer() {
           <button className="transport-btn" onClick={playNext} title="Next (→)">⏭</button>
         </div>
 
-        {/* Visualizer canvas */}
+        {/* Waveform history visualizer — always visible */}
         <canvas
           ref={canvasRef}
-          width={80}
-          height={22}
-          style={{
-            flexShrink: 0,
-            display: currentSong && isPlaying ? "block" : "none",
-            imageRendering: "pixelated",
-          }}
+          width={200}
+          height={24}
+          style={{ flexShrink: 0, display: "block" }}
         />
 
         {/* Now playing info + progress */}

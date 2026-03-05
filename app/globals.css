@@ -128,13 +128,12 @@ h1 {
   display: inline-block;
   flex-shrink: 0;
   letter-spacing: 0;
-  /* LCD cream text on dark body */
-  color: #C8B890;
+  color: #ffffff;
 }
-h1:hover { text-decoration: underline; color: #E0D0A8; }
+h1:hover { text-decoration: underline; color: rgba(255,255,255,0.8); }
 .nowPlaying {
   font-size: 0.75rem;
-  color: #8A7A6A;
+  color: rgba(255, 255, 255, 0.85);
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -216,15 +215,15 @@ button {
   text-overflow: ellipsis;
   flex-shrink: 1;
   min-width: 0;
-  color: #C8B890;
+  color: #ffffff;
 }
 .live-cat {
-  color: #8A6A50;
+  color: rgba(255, 255, 255, 0.5);
   font-size: 0.7rem;
 }
 .live-time {
   font-size: 0.7rem;
-  color: #8A7A6A;
+  color: rgba(255, 255, 255, 0.55);
   white-space: nowrap;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
