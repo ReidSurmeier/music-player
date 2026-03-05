@@ -49,8 +49,8 @@ body {
   padding: 0;
   margin: 0;
   width: 248px;
-  height: calc(100vh - 30px);
-  margin-top: 30px;
+  height: calc(100vh - 36px);
+  margin-top: 36px;
   position: fixed;
   border-right: 1px solid #222;
   overflow-y: scroll;
@@ -102,11 +102,11 @@ body {
   color: white !important;
 }
 
-/* ── TITLE BAR (.titleContainer) — exact nagizin ── */
+/* ── TITLE BAR (.titleContainer) ── */
 .titleContainer {
   position: fixed;
   top: 0;
-  padding: 4px 8px;
+  padding: 0 8px;
   border-bottom: 1px solid #222;
   width: 100%;
   z-index: 10;
@@ -114,8 +114,8 @@ body {
   font-size: 1rem;
   display: flex;
   align-items: center;
-  gap: 12px;
-  height: 30px;
+  gap: 8px;
+  height: 36px;
   overflow: hidden;
 }
 h1 {
@@ -125,15 +125,15 @@ h1 {
   flex-shrink: 0;
 }
 .nowPlaying {
-  font-size: 0.8rem;
-  color: #666;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
+  font-size: 0.75rem;
+  color: #888;
   flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
-.nowPlaying.active { color: #000; }
 
+/* Shared button base */
 button {
   cursor: pointer;
   display: inline-block;
@@ -149,12 +149,111 @@ button {
   white-space: nowrap;
 }
 
-/* ── CONTENT AREA — exact nagizin: position absolute, no conflicting constraints ── */
+/* Transport controls (⏮ ▶ ⏭) */
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.transport-btn {
+  background: none;
+  border: none;
+  border-radius: 4px;
+  padding: 0 4px;
+  font-size: 0.85rem;
+  height: 22px;
+  cursor: pointer;
+  color: #333;
+  font-family: inherit;
+  line-height: 1;
+}
+.transport-btn:hover { background-color: #e0e0e0; }
+.transport-btn.play-pause {
+  font-size: 1rem;
+  padding: 0 6px;
+  background-color: #222;
+  color: white;
+  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.transport-btn.play-pause:hover { background-color: #444; }
+
+/* Live info bar (title + scrubber + time) */
+.live-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0;
+}
+.live-title {
+  font-size: 0.75rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+  min-width: 0;
+}
+.live-cat {
+  color: #888;
+  font-size: 0.7rem;
+}
+.live-time {
+  font-size: 0.7rem;
+  color: #666;
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Progress slider */
+.progress-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 3px;
+  flex: 1;
+  min-width: 60px;
+  max-width: 240px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    #222 0%,
+    #222 var(--pct, 0%),
+    #ccc var(--pct, 0%),
+    #ccc 100%
+  );
+  outline: none;
+  cursor: pointer;
+}
+.progress-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #222;
+  cursor: pointer;
+}
+.progress-slider::-moz-range-thumb {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #222;
+  border: none;
+  cursor: pointer;
+}
+
+/* ── CONTENT AREA ── */
 .content {
   position: absolute;
   overflow-x: scroll;
   margin-left: 248px;
-  margin-top: 30px;
+  margin-top: 36px;
   scrollbar-width: none;
 }
 .content::-webkit-scrollbar { display: none; }
@@ -172,7 +271,7 @@ button {
   width: 250px;
   flex-shrink: 0;
   border-right: 1px dotted #222;
-  height: calc(100vh - 30px);
+  height: calc(100vh - 36px);
   scrollbar-width: none;
 }
 .category::-webkit-scrollbar { display: none; }

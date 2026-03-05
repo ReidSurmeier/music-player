@@ -10,7 +10,6 @@ interface Song {
   description: string;
   thumbnail: string;
   categories: string[];
-  available?: boolean;
 }
 
 interface Column {
@@ -28,167 +27,169 @@ const CATEGORY_ORDER = [
   "threewords","twowords","oneword",
 ];
 
-const LABEL_MAP: Record<string, string> = {
-  threewords: "Three Words",
-  twowords: "Two Words",
-  oneword: "One Word",
+const LABEL_MAP: Record<string,string> = {
+  threewords:"Three Words", twowords:"Two Words", oneword:"One Word",
 };
 
-// Actual CSS named colors matching each category — used as pill background like nagizin
-const CAT_BG: Record<string, string> = {
-  edible: "BurlyWood",
-  fruit: "Orange",
-  dessert: "PeachPuff",
-  people: "AliceBlue",
-  floral: "Lavender",
-  gemstones: "Turquoise",
-  location: "Peru",
-  alcohol: "Chartreuse",
-  animal: "Tan",
-  plants: "LawnGreen",
-  nature: "MediumSeaGreen",
-  metals: "Silver",
-  elements: "Aqua",
-  artifact: "AntiqueWhite",
-  fabric: "Linen",
-  time: "MediumSpringGreen",
-  mid: "MediumAquaMarine",
-  pale: "PaleGoldenRod",
-  light: "LightYellow",
-  dark: "DarkSlateGray",
-  deep: "DeepSkyBlue",
-  red: "Crimson",
-  yellow: "Yellow",
-  pink: "HotPink",
-  orange: "DarkOrange",
-  purple: "MediumPurple",
-  green: "LimeGreen",
-  blue: "CornflowerBlue",
-  brown: "SaddleBrown",
-  white: "WhiteSmoke",
-  gray: "Gray",
-  threewords: "LightSteelBlue",
-  twowords: "LightBlue",
-  oneword: "PowderBlue",
+const CAT_BG: Record<string,string> = {
+  edible:"BurlyWood", fruit:"Orange", dessert:"PeachPuff", people:"AliceBlue",
+  floral:"Lavender", gemstones:"Turquoise", location:"Peru", alcohol:"Chartreuse",
+  animal:"Tan", plants:"LawnGreen", nature:"MediumSeaGreen", metals:"Silver",
+  elements:"Aqua", artifact:"AntiqueWhite", fabric:"Linen", time:"MediumSpringGreen",
+  mid:"MediumAquaMarine", pale:"PaleGoldenRod", light:"LightYellow", dark:"DarkSlateGray",
+  deep:"DeepSkyBlue", red:"Crimson", yellow:"Yellow", pink:"HotPink", orange:"DarkOrange",
+  purple:"MediumPurple", green:"LimeGreen", blue:"CornflowerBlue", brown:"SaddleBrown",
+  white:"WhiteSmoke", gray:"Gray", threewords:"LightSteelBlue", twowords:"LightBlue",
+  oneword:"PowderBlue",
 };
 
 function catLabel(id: string) {
   return LABEL_MAP[id] || (id.charAt(0).toUpperCase() + id.slice(1));
 }
 
-function shortTitle(title: string) {
+function cleanTitle(title: string) {
   return title
-    .replace(/ - YouTube$/i, "")
-    .replace(/\s*\(Official.*?\)/gi, "")
-    .replace(/\s*\[Official.*?\]/gi, "")
-    .replace(/\s*\|.*$/, "")
+    .replace(/ - YouTube$/i,"")
+    .replace(/\s*\(Official[^)]*\)/gi,"")
+    .replace(/\s*\[Official[^)]*\]/gi,"")
+    .replace(/\s*\|.*$/,"")
     .trim()
-    .slice(0, 55);
+    .slice(0, 52);
+}
+
+function fmtTime(sec: number) {
+  if (!isFinite(sec) || isNaN(sec)) return "0:00";
+  const m = Math.floor(sec / 60);
+  const s = Math.floor(sec % 60);
+  return `${m}:${s.toString().padStart(2,"0")}`;
 }
 
 export default function MusicPlayer() {
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [columns, setColumns] = useState<Column[]>([]);
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const sidebarRef = useRef<HTMLUListElement>(null);
   const contentRef = useRef<HTMLElement>(null);
   const colRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const detailsRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
 
+  const [songs, setSongs] = useState<Song[]>([]);
+  const [columns, setColumns] = useState<Column[]>([]);
+  const [queue, setQueue] = useState<Song[]>([]); // current column's song list for next/prev
+  const [currentSong, setCurrentSong] = useState<Song | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [allOpen, setAllOpen] = useState(false);
+  const [errored, setErrored] = useState<Set<string>>(new Set());
+
+  // Load songs — no HEAD check, just load all
   useEffect(() => {
     fetch("/music-player/songs.json")
-      .then((r) => r.json())
-      .then(async (data: Song[]) => {
-        const checked = await Promise.all(
-          data.map(async (song) => {
-            try {
-              const res = await fetch(`/music-player/audio/${song.yt_id}.mp3`, { method: "HEAD" });
-              return { ...song, available: res.ok };
-            } catch {
-              return { ...song, available: false };
-            }
-          })
-        );
-        setSongs(checked);
-
-        // Group by primary category (first in array)
+      .then(r => r.json())
+      .then((data: Song[]) => {
+        setSongs(data);
         const colMap: Record<string, Song[]> = {};
-        checked.forEach((song) => {
+        data.forEach(song => {
           const cat = (song.categories || ["gray"])[0];
           if (!colMap[cat]) colMap[cat] = [];
           colMap[cat].push(song);
         });
-
         setColumns(
           CATEGORY_ORDER
-            .filter((cat) => colMap[cat]?.length)
-            .map((cat) => ({ id: cat, label: catLabel(cat), songs: colMap[cat] }))
+            .filter(cat => colMap[cat]?.length)
+            .map(cat => ({ id: cat, label: catLabel(cat), songs: colMap[cat] }))
         );
       });
   }, []);
 
-  const playSong = useCallback((song: Song) => {
-    if (!song.available) return;
+  // ── Play a song ──────────────────────────────────────────────────
+  const playSong = useCallback((song: Song, colSongs?: Song[]) => {
+    const audio = audioRef.current;
+    if (!audio) return;
 
-    // Close all open details, open this one
-    Object.values(detailsRefs.current).forEach((el) => {
-      if (el) el.open = false;
-    });
+    // Update queue for next/prev
+    if (colSongs) setQueue(colSongs);
+
+    // Close all pills, open this one
+    Object.values(detailsRefs.current).forEach(el => { if (el) el.open = false; });
     const det = detailsRefs.current[song.yt_id];
     if (det) det.open = true;
 
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.src = `/music-player/audio/${song.yt_id}.mp3`;
-      audioRef.current.play().catch(() => {});
-    }
+    audio.src = `/music-player/audio/${song.yt_id}.mp3`;
+    audio.load();
+    audio.play().catch(err => {
+      console.warn("Play failed:", err);
+      setIsPlaying(false);
+    });
+
     setCurrentSong(song);
     setIsPlaying(true);
+    setCurrentTime(0);
+    setDuration(0);
 
-    // Scroll sidebar
-    const li = sidebarRef.current?.querySelector(`[data-id="${song.yt_id}"]`) as HTMLElement;
+    // Scroll sidebar to song
+    const li = sidebarRef.current?.querySelector(`[data-ytid="${song.yt_id}"]`) as HTMLElement;
     li?.scrollIntoView({ block: "nearest" });
 
-    // Scroll column into view
+    // Scroll content to column
     const cat = (song.categories || ["gray"])[0];
     const col = colRefs.current[cat];
     if (col && contentRef.current) {
-      const colLeft = col.offsetLeft;
-      contentRef.current.scrollTo({ left: colLeft - 10, behavior: "smooth" });
+      contentRef.current.scrollTo({ left: col.offsetLeft - 4, behavior: "smooth" });
     }
   }, []);
 
+  // ── Next / Prev ───────────────────────────────────────────────────
   const playNext = useCallback(() => {
-    if (!currentSong) return;
-    const cat = (currentSong.categories || ["gray"])[0];
-    const col = columns.find((c) => c.id === cat);
-    if (!col) return;
-    const idx = col.songs.findIndex((s) => s.yt_id === currentSong.yt_id);
-    const next = col.songs.slice(idx + 1).find((s) => s.available);
-    if (next) playSong(next);
+    if (!currentSong || queue.length === 0) return;
+    const idx = queue.findIndex(s => s.yt_id === currentSong.yt_id);
+    const next = queue.slice(idx + 1).find(s => !errored.has(s.yt_id));
+    if (next) playSong(next, queue);
     else setIsPlaying(false);
-  }, [currentSong, columns, playSong]);
+  }, [currentSong, queue, errored, playSong]);
 
-  useEffect(() => {
-    const audio = new Audio();
-    audio.onended = playNext;
-    audio.onplay = () => setIsPlaying(true);
-    audio.onpause = () => setIsPlaying(false);
-    audioRef.current = audio;
-    return () => { audio.pause(); };
-  }, []);
+  const playPrev = useCallback(() => {
+    if (!currentSong || queue.length === 0) return;
+    const idx = queue.findIndex(s => s.yt_id === currentSong.yt_id);
+    const prev = [...queue.slice(0, idx)].reverse().find(s => !errored.has(s.yt_id));
+    if (prev) playSong(prev, queue);
+  }, [currentSong, queue, errored, playSong]);
 
-  useEffect(() => {
-    if (audioRef.current) audioRef.current.onended = playNext;
-  }, [playNext]);
+  const togglePlayPause = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio || !currentSong) return;
+    if (audio.paused) audio.play().catch(console.warn);
+    else audio.pause();
+  }, [currentSong]);
 
-  // Hover = color fill like nagizin, fade back after 2s
+  // ── Seek ──────────────────────────────────────────────────────────
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const t = Number(e.target.value);
+    audio.currentTime = t;
+    setCurrentTime(t);
+  };
+
+  // ── Toggle all details ─────────────────────────────────────────
+  const toggleAll = () => {
+    const next = !allOpen;
+    setAllOpen(next);
+    Object.values(detailsRefs.current).forEach(el => { if (el) el.open = next; });
+  };
+
+  // ── Details toggle handler ─────────────────────────────────────
+  const handleDetailsToggle = (song: Song, colSongs: Song[], el: HTMLDetailsElement) => {
+    if (el.open) {
+      playSong(song, colSongs);
+    } else if (currentSong?.yt_id === song.yt_id) {
+      audioRef.current?.pause();
+    }
+  };
+
+  // ── Sidebar hover (nagizin-style color on hover, fade back 2s) ──
   const onSidebarEnter = (el: HTMLLIElement, song: Song) => {
     if (currentSong?.yt_id === song.yt_id) return;
-    const cat = (song.categories || ["gray"])[0];
-    el.style.backgroundColor = CAT_BG[cat] || "#e0e0e0";
+    el.style.backgroundColor = CAT_BG[(song.categories||["gray"])[0]] || "#e0e0e0";
   };
   const onSidebarLeave = (el: HTMLLIElement, song: Song) => {
     setTimeout(() => {
@@ -196,25 +197,19 @@ export default function MusicPlayer() {
     }, 2000);
   };
 
-  const [allOpen, setAllOpen] = useState(false);
-  const toggleAll = () => {
-    const next = !allOpen;
-    setAllOpen(next);
-    Object.values(detailsRefs.current).forEach((el) => {
-      if (el) el.open = next;
-    });
-  };
+  // ── Keyboard shortcuts ─────────────────────────────────────────
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement) return;
+      if (e.code === "Space") { e.preventDefault(); togglePlayPause(); }
+      if (e.code === "ArrowRight") playNext();
+      if (e.code === "ArrowLeft") playPrev();
+    };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [togglePlayPause, playNext, playPrev]);
 
-  // Handle details toggle: if opened manually, play the song
-  const handleDetailsToggle = (song: Song, el: HTMLDetailsElement) => {
-    if (el.open) {
-      playSong(song);
-    } else if (currentSong?.yt_id === song.yt_id && audioRef.current) {
-      audioRef.current.pause();
-    }
-  };
-
-  // Resize reload — exact nagizin behavior
+  // ── Window resize reload (nagizin behavior) ────────────────────
   useEffect(() => {
     let t: ReturnType<typeof setTimeout>;
     const h = () => { clearTimeout(t); t = setTimeout(() => location.reload(), 300); };
@@ -222,90 +217,138 @@ export default function MusicPlayer() {
     return () => window.removeEventListener("resize", h);
   }, []);
 
+  const cat = currentSong ? (currentSong.categories || ["gray"])[0] : null;
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
   return (
     <>
-      {/* ── TITLE BAR ── */}
+      {/* ── AUDIO ELEMENT ─────────────────────────────────────────── */}
+      <audio
+        ref={audioRef}
+        onTimeUpdate={() => setCurrentTime(audioRef.current?.currentTime ?? 0)}
+        onDurationChange={() => setDuration(audioRef.current?.duration ?? 0)}
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+        onEnded={playNext}
+        onError={() => {
+          if (currentSong) {
+            setErrored(prev => new Set([...prev, currentSong.yt_id]));
+            playNext();
+          }
+        }}
+        style={{ display: "none" }}
+      />
+
+      {/* ── TITLE BAR ─────────────────────────────────────────────── */}
       <section className="titleContainer">
         <a href="#"><h1>SOUND__</h1></a>
+
         <button id="toggle-button" onClick={toggleAll}>
-          {allOpen ? "Hide All Descriptions" : "View All Descriptions"}
+          {allOpen ? "Hide All" : "View All"}
         </button>
-        <span className={`nowPlaying${currentSong ? " active" : ""}`}>
-          {currentSong
-            ? `${isPlaying ? "⏸" : "▶"} ${shortTitle(currentSong.title)}`
-            : "Nothing playing."}
-        </span>
+
+        {/* Transport controls */}
+        <div className="transport">
+          <button className="transport-btn" onClick={playPrev} title="Previous (←)">⏮</button>
+          <button className="transport-btn play-pause" onClick={togglePlayPause} title="Play/Pause (Space)">
+            {isPlaying ? "⏸" : "▶"}
+          </button>
+          <button className="transport-btn" onClick={playNext} title="Next (→)">⏭</button>
+        </div>
+
+        {/* Now playing info + progress */}
+        {currentSong ? (
+          <div className="live-bar">
+            <span className="live-title">
+              {cleanTitle(currentSong.title)}
+              {cat && <span className="live-cat"> [{catLabel(cat)}]</span>}
+            </span>
+            <span className="live-time">{fmtTime(currentTime)}</span>
+            <input
+              className="progress-slider"
+              type="range"
+              min={0}
+              max={duration || 100}
+              step={0.1}
+              value={currentTime}
+              onChange={handleSeek}
+              style={{ "--pct": `${progress}%` } as React.CSSProperties}
+            />
+            <span className="live-time">{fmtTime(duration)}</span>
+          </div>
+        ) : (
+          <span className="nowPlaying">Nothing playing. Click a song to begin.</span>
+        )}
       </section>
 
-      {/* ── SIDEBAR — master track list, styled like nagizin color list ── */}
+      {/* ── SIDEBAR — master track list ───────────────────────────── */}
       <ul className="colorList" ref={sidebarRef}>
-        {songs.map((song) => {
-          const cat = (song.categories || ["gray"])[0];
+        {songs.map(song => {
+          const songCat = (song.categories || ["gray"])[0];
           const isActive = currentSong?.yt_id === song.yt_id;
+          const isErr = errored.has(song.yt_id);
           return (
             <li
               key={song.yt_id}
-              data-id={song.yt_id}
+              data-ytid={song.yt_id}
               className={isActive ? "playing" : ""}
-              style={!song.available ? { opacity: 0.4, cursor: "default" } : {}}
-              onClick={() => playSong(song)}
-              onMouseOver={(e) => song.available && onSidebarEnter(e.currentTarget as HTMLLIElement, song)}
-              onMouseOut={(e) => song.available && onSidebarLeave(e.currentTarget as HTMLLIElement, song)}
+              style={isErr ? { opacity: 0.3, cursor: "default" } : {}}
+              onClick={() => {
+                if (isErr) return;
+                const col = columns.find(c => c.id === songCat);
+                playSong(song, col?.songs);
+              }}
+              onMouseOver={e => !isErr && onSidebarEnter(e.currentTarget as HTMLLIElement, song)}
+              onMouseOut={e => !isErr && onSidebarLeave(e.currentTarget as HTMLLIElement, song)}
             >
-              <table>
-                <tbody>
-                  <tr>
-                    <td title={shortTitle(song.title)}>{shortTitle(song.title)}</td>
-                    <td>{catLabel(cat)}</td>
-                    <td>{song.available ? "" : "–"}</td>
-                  </tr>
-                </tbody>
-              </table>
+              <table><tbody><tr>
+                <td title={cleanTitle(song.title)}>{cleanTitle(song.title)}</td>
+                <td>{catLabel(songCat)}</td>
+                <td>{isErr ? "×" : isActive && isPlaying ? "⏸" : ""}</td>
+              </tr></tbody></table>
             </li>
           );
         })}
       </ul>
 
-      {/* ── CONTENT — horizontal columns ── */}
-      {/* ref cast needed because section element type */}
-      <section
-        className="content"
-        ref={contentRef}
-      >
-        {/* Explicit width = columns * 250px forces overflow-x scroll, same trick as nagizin */}
+      {/* ── CONTENT — horizontal columns ──────────────────────────── */}
+      <section className="content" ref={contentRef}>
         <div
           id="categoryContainer"
           style={{ width: `${columns.length * 250}px` }}
         >
-          {columns.map((col) => (
+          {columns.map(col => (
             <div
               key={col.id}
               className={`category ${col.id}`}
-              ref={(el) => { colRefs.current[col.id] = el; }}
+              ref={el => { colRefs.current[col.id] = el; }}
             >
               <h2>{col.label}</h2>
-              {col.songs.map((song) => {
+              {col.songs.map(song => {
                 const bg = CAT_BG[col.id] || "LightGray";
                 const isActive = currentSong?.yt_id === song.yt_id;
+                const isErr = errored.has(song.yt_id);
                 return (
                   <details
                     key={song.yt_id}
-                    className={song.available ? "" : "unavailable"}
-                    style={song.available ? { backgroundColor: bg } : {}}
-                    ref={(el) => { detailsRefs.current[song.yt_id] = el; }}
-                    onToggle={(e) => song.available && handleDetailsToggle(song, e.currentTarget)}
+                    className={isErr ? "unavailable" : ""}
+                    style={!isErr ? { backgroundColor: bg } : {}}
+                    ref={el => { detailsRefs.current[song.yt_id] = el; }}
+                    onToggle={e =>
+                      !isErr && handleDetailsToggle(song, col.songs, e.currentTarget)
+                    }
                   >
                     <summary>
                       <span className="play-icon">
                         {isActive && isPlaying ? "⏸" : ""}
                       </span>
-                      {shortTitle(song.title)}
+                      {cleanTitle(song.title)}
                     </summary>
                     <figure>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
                         src={song.thumbnail}
-                        alt={shortTitle(song.title)}
+                        alt={cleanTitle(song.title)}
                         loading="lazy"
                       />
                       {song.description && (
