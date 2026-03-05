@@ -43,55 +43,87 @@ const LABEL_MAP: Record<string,string> = {
   threewords:"Three Words", twowords:"Two Words", oneword:"One Word",
 };
 
-// 10 colors directly from reidsurmeier.garden/fj09304u2.png
-const P = {
-  purple:  "#800080",
-  red:     "#FF0000",
-  blue:    "#0000FF",
-  lavender:"#D4C5F9",
-  cream:   "#F0E8D0",
-  dark:    "#333333",
-  steel:   "#6699CC",
-  orange:  "#FF6600",
-  green:   "#008000",
-  silver:  "#C0C0C0",
+// ── Color families: each category maps to a base hue.
+// Songs within the same column stay in the same hue family (±15°),
+// but each song gets a unique variation via yt_id hash.
+const CAT_HUE: Record<string, number> = {
+  // warm / orange family
+  edible: 28, animal: 28, brown: 28, yellow: 38, orange: 28,
+  // green family
+  fruit: 130, alcohol: 125, plants: 135, nature: 140, green: 130,
+  // blue / steel family
+  gemstones: 215, location: 218, metals: 210, elements: 210,
+  nature2: 215, mid: 210, twowords: 215,
+  // lavender / purple family
+  people: 265, floral: 270, light: 260, pink: 305, purple: 285, threewords: 265,
+  // blue deep family
+  deep: 225, blue: 225,
+  // red family
+  red: 5,
+  // cream / warm neutral family
+  dessert: 42, artifact: 40, fabric: 40, pale: 45, white: 48, oneword: 42,
+  // silver / grey family
+  metals2: 210, gray: 210,
+  // dark / muted
+  time: 20, dark: 18,
 };
-const CAT_BG: Record<string,string> = {
-  edible:    P.orange,  fruit:      P.green,  dessert:   P.cream,
-  people:    P.lavender,floral:     P.lavender,gemstones: P.steel,
-  location:  P.steel,  alcohol:    P.green,  animal:    P.orange,
-  plants:    P.green,  nature:     P.steel,  metals:    P.silver,
-  elements:  P.silver, artifact:   P.cream,  fabric:    P.cream,
-  time:      P.dark,   mid:        P.silver, pale:      P.cream,
-  light:     P.lavender,dark:      P.dark,   deep:      P.blue,
-  red:       P.red,    yellow:     P.orange, pink:      P.lavender,
-  orange:    P.orange, purple:     P.purple, green:     P.green,
-  blue:      P.blue,   brown:      P.orange, white:     P.cream,
-  gray:      P.silver, threewords: P.lavender,twowords: P.steel,
-  oneword:   P.cream,
+// Explicit lookup (overrides above where needed)
+const CAT_HUE_MAP: Record<string, number> = {
+  edible:47, fruit:128, dessert:42, people:265, floral:270,
+  gemstones:215, location:218, alcohol:125, animal:32, plants:132,
+  nature:140, metals:210, elements:208, artifact:40, fabric:44,
+  time:20, mid:210, pale:45, light:260, dark:18, deep:225,
+  red:5, yellow:38, pink:305, orange:28, purple:285, green:128,
+  blue:222, brown:30, white:48, gray:210,
+  threewords:265, twowords:215, oneword:42,
 };
+
+function hashInt(str: string): number {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function pillStyle(song: Song, available: boolean): React.CSSProperties {
+  if (!available) return { opacity: 0.4 };
+
+  const catId = song.categories?.[0] || "gray";
+  const baseHue = CAT_HUE_MAP[catId] ?? 210;
+  const hash = hashInt(song.yt_id);
+
+  // Variation within the family: ±14° hue, so songs in same column
+  // are clearly related but individually distinct
+  const hueShift = (hash % 29) - 14;
+  const h1 = (baseHue + hueShift + 360) % 360;
+  const h2 = (h1 + 18) % 360;
+
+  // Saturation: low-medium (25–42%), all muted/washed
+  const sat1 = 25 + (hash % 17);
+  const sat2 = sat1 + 5;
+
+  // Lightness: high (78–87%), keeps everything soft
+  const l1 = 78 + ((hash >> 4) % 9);
+  const l2 = l1 - 7;
+
+  // Dark category: invert lightness
+  const isDarkCat = catId === "dark" || catId === "time";
+  if (isDarkCat) {
+    const ds = 6 + (hash % 10);
+    const dl = 38 + ((hash >> 3) % 14);
+    return {
+      background: "linear-gradient(135deg,hsl(" + h1 + "," + ds + "%," + dl + "%) 0%,hsl(" + h2 + "," + (ds+4) + "%," + (dl-7) + "%) 100%)",
+      color: "#e8e8e8",
+    };
+  }
+
+  return {
+    background: "linear-gradient(135deg,hsl(" + h1 + "," + sat1 + "%," + l1 + "%) 0%,hsl(" + h2 + "," + sat2 + "%," + l2 + "%) 100%)",
+    color: "#555",
+  };
+}
 
 function catLabel(id: string) {
   return LABEL_MAP[id] || (id.charAt(0).toUpperCase() + id.slice(1));
-}
-
-// Per-song gradient: each song gets a unique two-stop gradient
-// Fallback to category color if no gradient stored
-function pillStyle(song: Song, available: boolean): React.CSSProperties {
-  if (!available) return { opacity: 0.4 };
-  if (song.gradient) {
-    const { from, to, hue } = song.gradient;
-    // Use white text for dark hues (purple, blue, green, red ranges)
-    const darkHue = (hue >= 180 && hue <= 320) || hue >= 340 || hue <= 20;
-    const sat = parseInt(from.slice(1,3), 16);
-    const isDark = sat < 130;
-    const grad = "linear-gradient(135deg, " + from + " 0%, " + to + " 100%)";
-    return {
-      background: grad,
-      color: isDark ? "#f5f0e8" : "#1E1814",
-    };
-  }
-  return { backgroundColor: CAT_BG[song.categories?.[0] || "gray"] || "#ddd" };
 }
 
 function cleanTitle(title: string) {
@@ -397,7 +429,9 @@ export default function MusicPlayer() {
   // currentSongRef avoids stale closure inside setTimeout
   const onSidebarEnter = useCallback((el: HTMLLIElement, song: Song) => {
     if (currentSongRef.current?.yt_id === song.yt_id) return;
-    const color = CAT_BG[(song.categories || ["gray"])[0]] || "#ddd";
+    const catId = (song.categories || ["gray"])[0];
+    const baseHue = CAT_HUE_MAP[catId] ?? 210;
+    const color = "hsl(" + baseHue + ",30%,80%)";
     el.style.backgroundColor = color;
   }, []);
 
