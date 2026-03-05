@@ -19,14 +19,13 @@ interface Column {
   songs: Song[];
 }
 
-// Ordered category list (nagizin order)
 const CATEGORY_ORDER = [
-  "edible", "fruit", "dessert", "people", "floral", "gemstones",
-  "location", "alcohol", "animal", "plants", "nature", "metals",
-  "elements", "artifact", "fabric", "time", "mid", "pale",
-  "light", "dark", "deep", "red", "yellow", "pink", "orange",
-  "purple", "green", "blue", "brown", "white", "gray",
-  "threewords", "twowords", "oneword",
+  "edible","fruit","dessert","people","floral","gemstones",
+  "location","alcohol","animal","plants","nature","metals",
+  "elements","artifact","fabric","time","mid","pale",
+  "light","dark","deep","red","yellow","pink","orange",
+  "purple","green","blue","brown","white","gray",
+  "threewords","twowords","oneword",
 ];
 
 const LABEL_MAP: Record<string, string> = {
@@ -35,45 +34,77 @@ const LABEL_MAP: Record<string, string> = {
   oneword: "One Word",
 };
 
-function categoryLabel(id: string): string {
+// Actual CSS named colors matching each category — used as pill background like nagizin
+const CAT_BG: Record<string, string> = {
+  edible: "BurlyWood",
+  fruit: "Orange",
+  dessert: "PeachPuff",
+  people: "AliceBlue",
+  floral: "Lavender",
+  gemstones: "Turquoise",
+  location: "Peru",
+  alcohol: "Chartreuse",
+  animal: "Tan",
+  plants: "LawnGreen",
+  nature: "MediumSeaGreen",
+  metals: "Silver",
+  elements: "Aqua",
+  artifact: "AntiqueWhite",
+  fabric: "Linen",
+  time: "MediumSpringGreen",
+  mid: "MediumAquaMarine",
+  pale: "PaleGoldenRod",
+  light: "LightYellow",
+  dark: "DarkSlateGray",
+  deep: "DeepSkyBlue",
+  red: "Crimson",
+  yellow: "Yellow",
+  pink: "HotPink",
+  orange: "DarkOrange",
+  purple: "MediumPurple",
+  green: "LimeGreen",
+  blue: "CornflowerBlue",
+  brown: "SaddleBrown",
+  white: "WhiteSmoke",
+  gray: "Gray",
+  threewords: "LightSteelBlue",
+  twowords: "LightBlue",
+  oneword: "PowderBlue",
+};
+
+function catLabel(id: string) {
   return LABEL_MAP[id] || (id.charAt(0).toUpperCase() + id.slice(1));
 }
 
-// Muted accent colors per category for hover effect
-const CAT_COLORS: Record<string, string> = {
-  edible: "#f5deb3", fruit: "#ffa07a", dessert: "#ffe4e1", people: "#deb887",
-  floral: "#ffe4e1", gemstones: "#e6e6fa", location: "#b0e0e6", alcohol: "#c0a080",
-  animal: "#d2b48c", plants: "#90ee90", nature: "#98fb98", metals: "#c0c0c0",
-  elements: "#e0e0e0", artifact: "#f5f5dc", fabric: "#faf0e6", time: "#fffacd",
-  mid: "#d3d3d3", pale: "#f8f8ff", light: "#fffff0", dark: "#696969",
-  deep: "#4682b4", red: "#fa8072", yellow: "#ffd700", pink: "#ffb6c1",
-  orange: "#ffdab9", purple: "#dda0dd", green: "#90ee90", blue: "#add8e6",
-  brown: "#d2b48c", white: "#f5f5f5", gray: "#d3d3d3", threewords: "#e8e8e8",
-  twowords: "#efefef", oneword: "#f8f8f8",
-};
+function shortTitle(title: string) {
+  return title
+    .replace(/ - YouTube$/i, "")
+    .replace(/\s*\(Official.*?\)/gi, "")
+    .replace(/\s*\[Official.*?\]/gi, "")
+    .replace(/\s*\|.*$/, "")
+    .trim()
+    .slice(0, 55);
+}
 
 export default function MusicPlayer() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [columns, setColumns] = useState<Column[]>([]);
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [allExpanded, setAllExpanded] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const columnRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const sidebarRef = useRef<HTMLUListElement | null>(null);
+  const contentRef = useRef<HTMLElement | null>(null);
+  const colRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const detailsRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
 
-  // Load songs and check which MP3s are available
   useEffect(() => {
     fetch("/music-player/songs.json")
       .then((r) => r.json())
       .then(async (data: Song[]) => {
-        // Check availability via HEAD request
         const checked = await Promise.all(
           data.map(async (song) => {
             try {
-              const res = await fetch(`/music-player/audio/${song.yt_id}.mp3`, {
-                method: "HEAD",
-              });
+              const res = await fetch(`/music-player/audio/${song.yt_id}.mp3`, { method: "HEAD" });
               return { ...song, available: res.ok };
             } catch {
               return { ...song, available: false };
@@ -82,26 +113,32 @@ export default function MusicPlayer() {
         );
         setSongs(checked);
 
-        // Build columns
+        // Group by primary category (first in array)
         const colMap: Record<string, Song[]> = {};
         checked.forEach((song) => {
-          const cats = song.categories || ["gray"];
-          // Place song in ALL its categories
-          cats.forEach((cat) => {
-            if (!colMap[cat]) colMap[cat] = [];
-            colMap[cat].push(song);
-          });
+          const cat = (song.categories || ["gray"])[0];
+          if (!colMap[cat]) colMap[cat] = [];
+          colMap[cat].push(song);
         });
 
-        const cols: Column[] = CATEGORY_ORDER.filter((cat) => colMap[cat]?.length > 0).map(
-          (cat) => ({ id: cat, label: categoryLabel(cat), songs: colMap[cat] })
+        setColumns(
+          CATEGORY_ORDER
+            .filter((cat) => colMap[cat]?.length)
+            .map((cat) => ({ id: cat, label: catLabel(cat), songs: colMap[cat] }))
         );
-        setColumns(cols);
       });
   }, []);
 
   const playSong = useCallback((song: Song) => {
     if (!song.available) return;
+
+    // Close all open details, open this one
+    Object.values(detailsRefs.current).forEach((el) => {
+      if (el) el.open = false;
+    });
+    const det = detailsRefs.current[song.yt_id];
+    if (det) det.open = true;
+
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.src = `/music-player/audio/${song.yt_id}.mp3`;
@@ -110,20 +147,22 @@ export default function MusicPlayer() {
     setCurrentSong(song);
     setIsPlaying(true);
 
-    // Scroll sidebar to this song
-    if (sidebarRef.current) {
-      const li = sidebarRef.current.querySelector(`[data-id="${song.yt_id}"]`) as HTMLElement;
-      if (li) li.scrollIntoView({ block: "nearest" });
+    // Scroll sidebar
+    const li = sidebarRef.current?.querySelector(`[data-id="${song.yt_id}"]`) as HTMLElement;
+    li?.scrollIntoView({ block: "nearest" });
+
+    // Scroll column into view
+    const cat = (song.categories || ["gray"])[0];
+    const col = colRefs.current[cat];
+    if (col && contentRef.current) {
+      const colLeft = col.offsetLeft;
+      contentRef.current.scrollTo({ left: colLeft - 10, behavior: "smooth" });
     }
-    // Scroll content to this song's column
-    const cat = song.categories[0];
-    const col = columnRefs.current[cat];
-    if (col) col.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "start" });
   }, []);
 
   const playNext = useCallback(() => {
     if (!currentSong) return;
-    const cat = currentSong.categories[0];
+    const cat = (currentSong.categories || ["gray"])[0];
     const col = columns.find((c) => c.id === cat);
     if (!col) return;
     const idx = col.songs.findIndex((s) => s.yt_id === currentSong.yt_id);
@@ -132,156 +171,149 @@ export default function MusicPlayer() {
     else setIsPlaying(false);
   }, [currentSong, columns, playSong]);
 
-  // Setup audio element
   useEffect(() => {
     const audio = new Audio();
     audio.onended = playNext;
     audio.onplay = () => setIsPlaying(true);
     audio.onpause = () => setIsPlaying(false);
     audioRef.current = audio;
-    return () => {
-      audio.pause();
-      audioRef.current = null;
-    };
+    return () => { audio.pause(); };
   }, []);
 
-  // Re-bind onended when playNext changes
   useEffect(() => {
     if (audioRef.current) audioRef.current.onended = playNext;
   }, [playNext]);
 
-  // Hover color effect on sidebar items (matching original nagizin behavior)
-  const handleSidebarHover = (el: HTMLLIElement, song: Song, entering: boolean) => {
+  // Hover = color fill like nagizin, fade back after 2s
+  const onSidebarEnter = (el: HTMLLIElement, song: Song) => {
     if (currentSong?.yt_id === song.yt_id) return;
-    const cat = song.categories[0];
-    const color = CAT_COLORS[cat] || "#e0e0e0";
-    if (entering) {
-      el.style.backgroundColor = color;
-    } else {
-      setTimeout(() => {
-        if (currentSong?.yt_id !== song.yt_id) el.style.backgroundColor = "";
-      }, 2000);
+    const cat = (song.categories || ["gray"])[0];
+    el.style.backgroundColor = CAT_BG[cat] || "#e0e0e0";
+  };
+  const onSidebarLeave = (el: HTMLLIElement, song: Song) => {
+    setTimeout(() => {
+      if (currentSong?.yt_id !== song.yt_id) el.style.backgroundColor = "";
+    }, 2000);
+  };
+
+  const [allOpen, setAllOpen] = useState(false);
+  const toggleAll = () => {
+    const next = !allOpen;
+    setAllOpen(next);
+    Object.values(detailsRefs.current).forEach((el) => {
+      if (el) el.open = next;
+    });
+  };
+
+  // Handle details toggle: if opened manually, play the song
+  const handleDetailsToggle = (song: Song, el: HTMLDetailsElement) => {
+    if (el.open) {
+      playSong(song);
+    } else if (currentSong?.yt_id === song.yt_id && audioRef.current) {
+      audioRef.current.pause();
     }
   };
 
-  // Hover color effect on play items
-  const handleItemHover = (el: HTMLDivElement, cat: string, entering: boolean) => {
-    const color = CAT_COLORS[cat] || "#e0e0e0";
-    if (entering) {
-      el.style.backgroundColor = color;
-    } else {
-      setTimeout(() => {
-        if (!el.classList.contains("active")) el.style.backgroundColor = "";
-      }, 2000);
-    }
-  };
-
-  const toggleAll = () => setAllExpanded((v) => !v);
-
-  const shortTitle = (title: string) =>
-    title.replace(/ - YouTube$/, "").replace(/ \(Official.*\)/, "").slice(0, 60);
+  // Resize reload — exact nagizin behavior
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    const h = () => { clearTimeout(t); t = setTimeout(() => location.reload(), 300); };
+    window.addEventListener("resize", h);
+    return () => window.removeEventListener("resize", h);
+  }, []);
 
   return (
     <>
-      {/* Hidden audio element placeholder */}
-      <div style={{ display: "none" }} />
-
-      {/* Title Bar */}
+      {/* ── TITLE BAR ── */}
       <section className="titleContainer">
         <a href="#"><h1>SOUND__</h1></a>
-        <span className={`nowPlaying ${currentSong ? "active" : ""}`}>
+        <button id="toggle-button" onClick={toggleAll}>
+          {allOpen ? "Hide All Descriptions" : "View All Descriptions"}
+        </button>
+        <span className={`nowPlaying${currentSong ? " active" : ""}`}>
           {currentSong
             ? `${isPlaying ? "⏸" : "▶"} ${shortTitle(currentSong.title)}`
             : "Nothing playing."}
         </span>
-        <button id="toggle-button" onClick={toggleAll}>
-          {allExpanded ? "Hide All" : "View All"}
-        </button>
       </section>
 
-      {/* Sidebar — master track list */}
+      {/* ── SIDEBAR — master track list, styled like nagizin color list ── */}
       <ul className="colorList" ref={sidebarRef}>
-        {songs.map((song) => (
-          <li
-            key={song.yt_id}
-            data-id={song.yt_id}
-            className={currentSong?.yt_id === song.yt_id ? "playing" : ""}
-            style={!song.available ? { opacity: 0.35, cursor: "default" } : {}}
-            onClick={() => playSong(song)}
-            onMouseOver={(e) =>
-              song.available && handleSidebarHover(e.currentTarget as HTMLLIElement, song, true)
-            }
-            onMouseOut={(e) =>
-              song.available && handleSidebarHover(e.currentTarget as HTMLLIElement, song, false)
-            }
-          >
-            <span className="track-title">{shortTitle(song.title)}</span>
-            <span className="track-cat">{song.categories.join(", ")}</span>
-          </li>
-        ))}
+        {songs.map((song) => {
+          const cat = (song.categories || ["gray"])[0];
+          const isActive = currentSong?.yt_id === song.yt_id;
+          return (
+            <li
+              key={song.yt_id}
+              data-id={song.yt_id}
+              className={isActive ? "playing" : ""}
+              style={!song.available ? { opacity: 0.4, cursor: "default" } : {}}
+              onClick={() => playSong(song)}
+              onMouseOver={(e) => song.available && onSidebarEnter(e.currentTarget as HTMLLIElement, song)}
+              onMouseOut={(e) => song.available && onSidebarLeave(e.currentTarget as HTMLLIElement, song)}
+            >
+              <table>
+                <tbody>
+                  <tr>
+                    <td title={shortTitle(song.title)}>{shortTitle(song.title)}</td>
+                    <td>{catLabel(cat)}</td>
+                    <td>{song.available ? "" : "–"}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </li>
+          );
+        })}
       </ul>
 
-      {/* Content area — horizontal columns */}
-      <section className="content">
+      {/* ── CONTENT — horizontal columns ── */}
+      <section
+        className="content"
+        ref={contentRef as React.RefObject<HTMLElement>}
+      >
         <div id="categoryContainer">
           {columns.map((col) => (
             <div
               key={col.id}
               className={`category ${col.id}`}
-              ref={(el) => { columnRefs.current[col.id] = el; }}
+              ref={(el) => { colRefs.current[col.id] = el; }}
             >
               <h2>{col.label}</h2>
-              {col.songs.length === 0 && <div className="category-empty" />}
               {col.songs.map((song) => {
+                const bg = CAT_BG[col.id] || "LightGray";
                 const isActive = currentSong?.yt_id === song.yt_id;
                 return (
-                  <div
-                    key={`${col.id}-${song.yt_id}`}
-                    className={`play-item${isActive ? " active" : ""}${!song.available ? " unavailable" : ""}`}
-                    onClick={() => playSong(song)}
-                    onMouseOver={(e) =>
-                      song.available && handleItemHover(e.currentTarget as HTMLDivElement, col.id, true)
-                    }
-                    onMouseOut={(e) =>
-                      song.available && handleItemHover(e.currentTarget as HTMLDivElement, col.id, false)
-                    }
+                  <details
+                    key={song.yt_id}
+                    className={song.available ? "" : "unavailable"}
+                    style={song.available ? { backgroundColor: bg } : {}}
+                    ref={(el) => { detailsRefs.current[song.yt_id] = el; }}
+                    onToggle={(e) => song.available && handleDetailsToggle(song, e.currentTarget)}
                   >
-                    <span className="play-indicator">
-                      {isActive && isPlaying ? "⏸" : song.available ? "" : ""}
-                    </span>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      className="song-thumb"
-                      src={song.thumbnail}
-                      alt=""
-                      loading="lazy"
-                    />
-                    <div className="song-info">
-                      <div className="song-title">{shortTitle(song.title)}</div>
-                    </div>
-                  </div>
+                    <summary>
+                      <span className="play-icon">
+                        {isActive && isPlaying ? "⏸" : ""}
+                      </span>
+                      {shortTitle(song.title)}
+                    </summary>
+                    <figure>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={song.thumbnail}
+                        alt={shortTitle(song.title)}
+                        loading="lazy"
+                      />
+                      {song.description && (
+                        <figcaption>{song.description.slice(0, 120)}</figcaption>
+                      )}
+                    </figure>
+                  </details>
                 );
               })}
             </div>
           ))}
         </div>
       </section>
-
-      {/* Window resize reload (matching original) */}
-      <ResizeReloader />
     </>
   );
-}
-
-function ResizeReloader() {
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    const handler = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => location.reload(), 300);
-    };
-    window.addEventListener("resize", handler);
-    return () => window.removeEventListener("resize", handler);
-  }, []);
-  return null;
 }

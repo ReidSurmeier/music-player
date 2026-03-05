@@ -1,15 +1,15 @@
 /* ============================================================
-   SOUND__ — based on nagizin.xyz/htmlColorList/ CSS (verbatim)
-   Fonts updated to /fonts/ path, music player additions added
+   SOUND__ — pixel-perfect replica of nagizin.xyz/htmlColorList/
+   CSS copied verbatim, font paths adapted, music additions noted
    ============================================================ */
 
 @font-face {
   font-family: AUTHENTICSans-Condensed-90;
-  src: url(/music-player/fonts/AUTHENTICSans-Condensed-90.woff);
+  src: url(/music-player/fonts/AUTHENTICSans-Condensed-90.woff) format("woff");
 }
 @font-face {
   font-family: AUTHENTICSans-90;
-  src: url(/music-player/fonts/AUTHENTICSans-90.woff);
+  src: url(/music-player/fonts/AUTHENTICSans-90.woff) format("woff");
 }
 @font-face {
   font-family: "SpokaHanSansNeo";
@@ -41,55 +41,7 @@ body {
   overflow: hidden;
 }
 
-/* ── TITLE BAR ── */
-.titleContainer {
-  position: fixed;
-  top: 0;
-  padding: 4px 8px;
-  border-bottom: 1px solid #222;
-  width: 100%;
-  z-index: 10;
-  background-color: white;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  height: 30px;
-}
-h1 {
-  margin: 0;
-  font-size: 1rem;
-  display: inline-block;
-  white-space: nowrap;
-}
-.nowPlaying {
-  flex: 1;
-  font-size: 0.8rem;
-  color: #444;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-.nowPlaying.active {
-  color: #000;
-}
-
-button {
-  cursor: pointer;
-  display: inline-block;
-  background-color: rgb(220, 220, 220);
-  border: 0px solid black;
-  border-radius: 10px;
-  font-size: 0.75rem;
-  height: 20px;
-  font-family: "AUTHENTICSans-Condensed-90", sans-serif;
-  line-height: 1.5;
-  padding: 0px 10px;
-  white-space: nowrap;
-  flex-shrink: 0;
-}
-
-/* ── SIDEBAR (track list — replaces color list) ── */
+/* ── LEFT SIDEBAR (.colorList) — exact nagizin sizing ── */
 .colorList {
   display: flex;
   flex-direction: column;
@@ -103,11 +55,13 @@ button {
   border-right: 1px solid #222;
   overflow-y: scroll;
   scrollbar-width: none;
+  left: 0;
+  top: 0;
+  z-index: 2;
 }
-.colorList::-webkit-scrollbar {
-  display: none;
-}
+.colorList::-webkit-scrollbar { display: none; }
 
+/* Exact nagizin li style */
 .colorList li {
   font-size: 0.8rem;
   line-height: 1.5;
@@ -117,31 +71,82 @@ button {
   box-sizing: border-box;
   margin: 0;
   cursor: pointer;
-  transition: background-color 0.15s;
-  overflow: hidden;
 }
-.colorList li .track-title {
-  display: block;
+
+/* table inside each li — same as nagizin's td width: 70px */
+.colorList li table {
+  border-collapse: collapse;
+  width: 100%;
+}
+.colorList li td {
+  width: 70px;
+  font-size: 0.8rem;
+  padding: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  max-width: 230px;
 }
-.colorList li .track-cat {
-  font-size: 0.65rem;
-  color: #888;
-  padding-bottom: 3px;
-  display: block;
+.colorList li td:first-child {
+  width: 110px;
+}
+.colorList li td:last-child {
+  width: auto;
+  color: #666;
+  font-size: 0.7rem;
 }
 .colorList li.playing {
   background-color: black !important;
   color: white;
 }
-.colorList li.playing .track-cat {
-  color: #aaa;
+.colorList li.playing td {
+  color: white !important;
 }
-.colorList li:hover:not(.playing) {
-  /* hover color set inline via JS */
+
+/* ── TITLE BAR (.titleContainer) — exact nagizin ── */
+.titleContainer {
+  position: fixed;
+  top: 0;
+  padding: 4px 8px;
+  border-bottom: 1px solid #222;
+  width: 100%;
+  z-index: 10;
+  background-color: white;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  height: 30px;
+  overflow: hidden;
+}
+h1 {
+  margin: 0;
+  font-size: 1rem;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.nowPlaying {
+  font-size: 0.8rem;
+  color: #666;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  flex: 1;
+}
+.nowPlaying.active { color: #000; }
+
+button {
+  cursor: pointer;
+  display: inline-block;
+  background-color: rgb(220, 220, 220);
+  border: 0px solid black;
+  border-radius: 10px;
+  font-size: 12pt;
+  height: 20px;
+  font-family: "AUTHENTICSans-Condensed-90", sans-serif;
+  line-height: 1.5;
+  padding: 0px 10px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 /* ── CONTENT AREA ── */
@@ -153,10 +158,10 @@ button {
   margin-top: 30px;
   height: calc(100vh - 30px);
   scrollbar-width: none;
+  right: 0;
+  left: 0;
 }
-.content::-webkit-scrollbar {
-  display: none;
-}
+.content::-webkit-scrollbar { display: none; }
 
 #categoryContainer {
   display: flex;
@@ -165,19 +170,16 @@ button {
   background: white;
 }
 
-/* ── CATEGORY COLUMNS ── */
+/* ── CATEGORY COLUMNS — exact nagizin ── */
 .category {
   overflow-y: scroll;
-  overflow-x: hidden;
   width: 250px;
   flex-shrink: 0;
   border-right: 1px dotted #222;
-  height: 100%;
+  height: calc(100vh - 30px);
   scrollbar-width: none;
 }
-.category::-webkit-scrollbar {
-  display: none;
-}
+.category::-webkit-scrollbar { display: none; }
 
 h2 {
   font-size: 18px;
@@ -189,79 +191,69 @@ h2 {
   z-index: 1;
 }
 
-/* ── SONG ITEMS (styled like nagizin <details> / color items) ── */
-.play-item {
+/* ── DETAILS PILLS — exact nagizin style ── */
+details {
+  margin-bottom: 0px;
   cursor: pointer;
-  padding: 5px 5px 4px 7px;
-  border-bottom: 1px dotted #222;
-  display: flex;
-  align-items: flex-start;
-  gap: 6px;
-  transition: background-color 0.15s;
-  position: relative;
-}
-.play-item:hover:not(.active) {
-  /* color set via JS */
-}
-.play-item.active {
-  background-color: black !important;
-  color: white;
-}
-.play-item .play-indicator {
-  font-size: 0.65rem;
-  width: 12px;
-  flex-shrink: 0;
-  padding-top: 2px;
-  color: #555;
-}
-.play-item.active .play-indicator {
-  color: white;
-}
-.play-item .song-thumb {
-  width: 36px;
-  height: 27px;
-  object-fit: cover;
-  flex-shrink: 0;
-  border: 1px solid #ddd;
-}
-.play-item.active .song-thumb {
-  border-color: #555;
-}
-.play-item .song-info {
-  flex: 1;
-  overflow: hidden;
-}
-.play-item .song-title {
-  font-size: 0.78rem;
-  line-height: 1.3;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-}
-.play-item.unavailable {
-  opacity: 0.35;
-  cursor: default;
-}
-.play-item.unavailable::after {
-  content: "•";
-  color: gray;
-  font-size: 10px;
-  position: absolute;
-  right: 5px;
-  top: 5px;
+  padding: 5px 5px 0 7px;
+  border-radius: 50%;
 }
 
-/* ── EMPTY CATEGORY PLACEHOLDER ── */
-.category-empty::before {
+details:empty::before {
   content: "•";
   color: gray;
   font-size: 20px;
-  padding: 8px 7px;
-  display: block;
+  margin-right: 8px;
 }
 
-/* ── RESPONSIVE (exact nagizin breakpoints) ── */
+summary {
+  border-bottom: 1px dotted black;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+summary::-webkit-details-marker { display: none; }
+
+.play-icon {
+  font-size: 0.6rem;
+  width: 12px;
+  flex-shrink: 0;
+}
+
+details[open] summary {
+  border-bottom: none;
+}
+details[open] summary .play-icon::before { content: "⏸"; }
+details:not([open]) summary:hover .play-icon::before { content: "▶"; }
+
+/* figure inside expanded details — exact nagizin */
+figure {
+  padding: 0 30px 0px 30px;
+  margin: 0 40px 0px 40px;
+}
+figure img {
+  width: 100%;
+}
+figcaption {
+  font-size: 10pt;
+  background-color: white;
+  padding: 3px;
+}
+
+/* unavailable song pill */
+details.unavailable {
+  opacity: 0.4;
+  cursor: default;
+}
+details.unavailable summary:after {
+  content: " ·";
+  color: gray;
+}
+
+/* ── RESPONSIVE — exact nagizin breakpoints ── */
 @media (max-width: 1155px) {
   .colorList {
     margin-top: 52px;
@@ -269,18 +261,11 @@ h2 {
   }
   .content {
     margin-top: 52px;
-    position: fixed;
     height: calc(100vh - 52px);
   }
   .category {
-    height: 100%;
+    height: calc(100vh - 52px);
     padding-bottom: 400px;
-  }
-  .titleContainer {
-    height: auto;
-    flex-wrap: wrap;
-    row-gap: 2px;
-    padding: 4px 8px;
   }
 }
 
@@ -296,7 +281,6 @@ h2 {
   }
   .colorList li {
     min-width: 180px;
-    height: auto;
     border-right: 1px solid #222;
     border-bottom: none;
   }
@@ -312,23 +296,18 @@ h2 {
     padding: 2px 4px;
     height: auto;
   }
-  h1 {
-    font-size: 15px;
-  }
-  h2 {
-    font-size: 15px;
-  }
+  h1 { font-size: 15px; }
+  summary { font-size: 0.8rem; }
+  h2 { font-size: 15px; }
   .category {
     width: 200px;
     background-color: white;
   }
+  figure { padding: 0; margin: 0 30px; }
+  figcaption { font-size: 0.7rem; }
 }
 
 @media (max-width: 499px) {
-  .colorList {
-    margin-top: 58px;
-  }
-  .content {
-    margin-top: calc(40vh + 0px);
-  }
+  .colorList { margin-top: 58px; }
+  .content { margin-top: calc(40vh + 0px); }
 }
