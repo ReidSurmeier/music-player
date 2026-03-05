@@ -180,14 +180,33 @@ export default function MusicPlayer() {
     Object.values(detailsRefs.current).forEach(el => { if (el) el.open = next; });
   };
 
-  // ── Details toggle handler ─────────────────────────────────────
-  const handleDetailsToggle = (song: Song, colSongs: Song[], el: HTMLDetailsElement) => {
-    if (el.open) {
+  // ── Summary click — intercept native toggle to avoid cascade ──
+  // onToggle fires for EVERY programmatic .open= change, causing infinite loops.
+  // Instead: e.preventDefault() stops the browser toggle, we manage state manually.
+  const handleSummaryClick = useCallback((
+    e: React.MouseEvent,
+    song: Song,
+    colSongs: Song[]
+  ) => {
+    e.preventDefault();
+    const det = detailsRefs.current[song.yt_id];
+    if (!det) return;
+
+    if (det.open) {
+      // Collapse this pill and pause
+      det.open = false;
+      if (currentSongRef.current?.yt_id === song.yt_id) {
+        audioRef.current?.pause();
+      }
+    } else {
+      // Close every other pill (no onToggle fires — we own the state)
+      Object.values(detailsRefs.current).forEach(el => {
+        if (el && el !== det) el.open = false;
+      });
+      det.open = true;
       playSong(song, colSongs);
-    } else if (currentSong?.yt_id === song.yt_id) {
-      audioRef.current?.pause();
     }
-  };
+  }, [playSong]);
 
   // ── Sidebar hover — exact nagizin behavior ──────────────────────
   // onMouseEnter/Leave (not Over/Out) so child elements don't retrigger
@@ -344,11 +363,10 @@ export default function MusicPlayer() {
                     className={isErr ? "unavailable" : ""}
                     style={!isErr ? { backgroundColor: bg } : {}}
                     ref={el => { detailsRefs.current[song.yt_id] = el; }}
-                    onToggle={e =>
-                      !isErr && handleDetailsToggle(song, col.songs, e.currentTarget)
-                    }
                   >
-                    <summary>
+                    <summary
+                      onClick={e => !isErr && handleSummaryClick(e, song, col.songs)}
+                    >
                       <span className="play-icon">
                         {isActive && isPlaying ? "⏸" : ""}
                       </span>
