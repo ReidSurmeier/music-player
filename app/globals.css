@@ -97,9 +97,14 @@ body {
 .colorList li.playing {
   background-color: black !important;
   color: white;
+  cursor: default;
 }
 .colorList li.playing td {
   color: white !important;
+}
+/* Cursor affordance for hoverable items */
+.colorList li:not(.playing):hover {
+  cursor: pointer;
 }
 
 /* ── TITLE BAR (.titleContainer) ── */

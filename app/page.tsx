@@ -70,6 +70,8 @@ export default function MusicPlayer() {
   const contentRef = useRef<HTMLElement>(null);
   const colRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const detailsRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
+  // Ref always holds latest currentSong — avoids stale closure in setTimeout
+  const currentSongRef = useRef<Song | null>(null);
 
   const [songs, setSongs] = useState<Song[]>([]);
   const [columns, setColumns] = useState<Column[]>([]);
@@ -122,6 +124,7 @@ export default function MusicPlayer() {
     });
 
     setCurrentSong(song);
+    currentSongRef.current = song;
     setIsPlaying(true);
     setCurrentTime(0);
     setDuration(0);
@@ -186,16 +189,23 @@ export default function MusicPlayer() {
     }
   };
 
-  // ── Sidebar hover (nagizin-style color on hover, fade back 2s) ──
-  const onSidebarEnter = (el: HTMLLIElement, song: Song) => {
-    if (currentSong?.yt_id === song.yt_id) return;
-    el.style.backgroundColor = CAT_BG[(song.categories||["gray"])[0]] || "#e0e0e0";
-  };
-  const onSidebarLeave = (el: HTMLLIElement, song: Song) => {
+  // ── Sidebar hover — exact nagizin behavior ──────────────────────
+  // onMouseEnter/Leave (not Over/Out) so child elements don't retrigger
+  // currentSongRef avoids stale closure inside setTimeout
+  const onSidebarEnter = useCallback((el: HTMLLIElement, song: Song) => {
+    if (currentSongRef.current?.yt_id === song.yt_id) return;
+    const color = CAT_BG[(song.categories || ["gray"])[0]] || "#ddd";
+    el.style.backgroundColor = color;
+  }, []);
+
+  const onSidebarLeave = useCallback((el: HTMLLIElement, song: Song) => {
     setTimeout(() => {
-      if (currentSong?.yt_id !== song.yt_id) el.style.backgroundColor = "";
+      // Only reset if this song isn't currently playing
+      if (currentSongRef.current?.yt_id !== song.yt_id) {
+        el.style.backgroundColor = "";
+      }
     }, 2000);
-  };
+  }, []);
 
   // ── Keyboard shortcuts ─────────────────────────────────────────
   useEffect(() => {
@@ -231,8 +241,8 @@ export default function MusicPlayer() {
         onPause={() => setIsPlaying(false)}
         onEnded={playNext}
         onError={() => {
-          if (currentSong) {
-            setErrored(prev => new Set([...prev, currentSong.yt_id]));
+          if (currentSongRef.current) {
+            setErrored(prev => new Set([...prev, currentSongRef.current!.yt_id]));
             playNext();
           }
         }}
@@ -298,8 +308,8 @@ export default function MusicPlayer() {
                 const col = columns.find(c => c.id === songCat);
                 playSong(song, col?.songs);
               }}
-              onMouseOver={e => !isErr && onSidebarEnter(e.currentTarget as HTMLLIElement, song)}
-              onMouseOut={e => !isErr && onSidebarLeave(e.currentTarget as HTMLLIElement, song)}
+              onMouseEnter={e => !isErr && onSidebarEnter(e.currentTarget as HTMLLIElement, song)}
+              onMouseLeave={e => !isErr && onSidebarLeave(e.currentTarget as HTMLLIElement, song)}
             >
               <table><tbody><tr>
                 <td title={cleanTitle(song.title)}>{cleanTitle(song.title)}</td>
