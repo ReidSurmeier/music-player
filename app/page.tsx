@@ -92,8 +92,8 @@ export default function MusicPlayer() {
   const [currentSong, setCurrentSong] = useState<Song | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const sidebarRef = useRef<HTMLUListElement | null>(null);
-  const contentRef = useRef<HTMLElement | null>(null);
+  const sidebarRef = useRef<HTMLUListElement>(null);
+  const contentRef = useRef<HTMLElement>(null);
   const colRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const detailsRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
 
@@ -267,11 +267,16 @@ export default function MusicPlayer() {
       </ul>
 
       {/* ── CONTENT — horizontal columns ── */}
+      {/* ref cast needed because section element type */}
       <section
         className="content"
-        ref={contentRef as React.RefObject<HTMLElement>}
+        ref={contentRef}
       >
-        <div id="categoryContainer">
+        {/* Explicit width = columns * 250px forces overflow-x scroll, same trick as nagizin */}
+        <div
+          id="categoryContainer"
+          style={{ width: `${columns.length * 250}px` }}
+        >
           {columns.map((col) => (
             <div
               key={col.id}

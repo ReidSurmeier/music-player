@@ -149,24 +149,20 @@ button {
   white-space: nowrap;
 }
 
-/* ── CONTENT AREA ── */
+/* ── CONTENT AREA — exact nagizin: position absolute, no conflicting constraints ── */
 .content {
   position: absolute;
   overflow-x: scroll;
-  overflow-y: hidden;
   margin-left: 248px;
   margin-top: 30px;
-  height: calc(100vh - 30px);
   scrollbar-width: none;
-  right: 0;
-  left: 0;
 }
 .content::-webkit-scrollbar { display: none; }
 
+/* Width is set inline via style prop: columns.length * 250px forces the overflow */
 #categoryContainer {
   display: flex;
   align-items: stretch;
-  height: 100%;
   background: white;
 }
 
@@ -261,7 +257,6 @@ details.unavailable summary:after {
   }
   .content {
     margin-top: 52px;
-    height: calc(100vh - 52px);
   }
   .category {
     height: calc(100vh - 52px);
