@@ -43,39 +43,44 @@ const LABEL_MAP: Record<string,string> = {
   threewords:"Three Words", twowords:"Two Words", oneword:"One Word",
 };
 
-// ── Color families: each category maps to a base hue.
-// Songs within the same column stay in the same hue family (±15°),
-// but each song gets a unique variation via yt_id hash.
-const CAT_HUE: Record<string, number> = {
-  // warm / orange family
-  edible: 28, animal: 28, brown: 28, yellow: 38, orange: 28,
-  // green family
-  fruit: 130, alcohol: 125, plants: 135, nature: 140, green: 130,
-  // blue / steel family
-  gemstones: 215, location: 218, metals: 210, elements: 210,
-  nature2: 215, mid: 210, twowords: 215,
-  // lavender / purple family
-  people: 265, floral: 270, light: 260, pink: 305, purple: 285, threewords: 265,
-  // blue deep family
-  deep: 225, blue: 225,
-  // red family
-  red: 5,
-  // cream / warm neutral family
-  dessert: 42, artifact: 40, fabric: 40, pale: 45, white: 48, oneword: 42,
-  // silver / grey family
-  metals2: 210, gray: 210,
-  // dark / muted
-  time: 20, dark: 18,
-};
-// Explicit lookup (overrides above where needed)
-const CAT_HUE_MAP: Record<string, number> = {
-  edible:47, fruit:128, dessert:42, people:265, floral:270,
-  gemstones:215, location:218, alcohol:125, animal:32, plants:132,
-  nature:140, metals:210, elements:208, artifact:40, fabric:44,
-  time:20, mid:210, pale:45, light:260, dark:18, deep:225,
-  red:5, yellow:38, pink:305, orange:28, purple:285, green:128,
-  blue:222, brown:30, white:48, gray:210,
-  threewords:265, twowords:215, oneword:42,
+// ── Actual nagizin.xyz/htmlColorList/ colors, grouped by category.
+// Each song picks 2 colors from its column's palette and gradients between
+// their pastel versions — so every column has a recognizable color family.
+const NC: Record<string, string[]> = {
+  alcohol:    ["#7FFF00"],
+  animal:     ["#F5F5DC","#FF7F50","#E9967A","#FFFFF0","#F08080","#FFA07A","#FA8072","#FFF5EE"],
+  artifact:   ["#FAEBD7","#B22222","#B0C4DE","#FAF0E6","#FFE4B5","#FDF5E6","#B0E0E6","#4682B4"],
+  blue:       ["#F0F8FF","#6495ED","#00BFFF","#1E90FF","#ADD8E6","#E0FFFF","#87CEFA","#B0C4DE","#4169E1","#87CEEB","#4682B4"],
+  brown:      ["#A52A2A","#BC8F8F","#8B4513","#F4A460"],
+  dark:       ["#00008B","#008B8B","#B8860B","#556B2F","#9932CC","#8B0000","#483D8B","#2F4F4F","#00CED1","#9400D3"],
+  deep:       ["#FF1493","#00BFFF"],
+  dessert:    ["#D2691E","#FFF8DC","#FF8C00","#F0FFF0","#FFFACD","#FFA500","#FFEFD5","#FFDAB9","#DDA0DD"],
+  edible:     ["#FFE4C4","#FFEBCD","#D2691E","#FF7F50","#FFF8DC","#FF8C00","#E9967A","#F0FFF0","#FFA07A","#FFA500","#DA70D6","#EEE8AA"],
+  elements:   ["#00FFFF","#7FFFD4","#66CDAA","#B22222"],
+  fabric:     ["#FAF0E6","#FDF5E6"],
+  floral:     ["#8A2BE2","#6495ED","#9932CC","#9400D3","#FFFAF0","#DAA520","#E6E6FA","#C71585","#DA70D6","#DB7093","#D8BFD8","#EE82EE"],
+  fruit:      ["#556B2F","#FF8C00","#F0FFF0","#FFFACD","#00FF00","#32CD32","#808000","#FFA500","#FFEFD5","#FFDAB9"],
+  gemstones:  ["#F0FFFF","#00CED1","#FFD700","#48D1CC","#AFEEEE","#C0C0C0","#40E0D0"],
+  gray:       ["#A9A9A9","#2F4F4F","#696969","#808080","#D3D3D3","#708090"],
+  green:      ["#7FFF00","#006400","#556B2F","#228B22","#008000","#90EE90","#32CD32","#3CB371","#808000","#98FB98","#2E8B57","#9ACD32"],
+  light:      ["#ADD8E6","#F08080","#E0FFFF","#FAFAD2","#D3D3D3","#90EE90","#FFB6C1","#FFA07A","#87CEFA","#B0C4DE","#FFFFE0"],
+  location:   ["#CD5C5C","#CD853F","#A0522D"],
+  metals:     ["#483D8B","#2F4F4F","#778899","#B0C4DE","#C0C0C0","#708090","#4682B4"],
+  mid:        ["#66CDAA","#0000CD","#BA55D3","#9370DB","#3CB371","#7B68EE","#00FA9A","#48D1CC","#C71585"],
+  nature:     ["#00FFFF","#7FFFD4","#DEB887","#FF7F50","#8FBC8F","#228B22","#7CFC00","#3CB371","#87CEEB"],
+  oneword:    ["#00FFFF","#F0FFFF","#F5F5DC","#FFE4C4","#FF7F50","#DC143C","#DCDCDC","#FFD700","#FFFFF0","#F0E68C","#E6E6FA","#FAF0E6","#DA70D6","#C0C0C0","#D2B48C","#40E0D0","#EE82EE"],
+  orange:     ["#FF8C00","#FFA500"],
+  pale:       ["#EEE8AA","#98FB98","#AFEEEE","#DB7093"],
+  people:     ["#F0F8FF","#5F9EA0","#1E90FF","#DCDCDC","#FFDEAD","#4169E1"],
+  pink:       ["#FF1493","#FF69B4","#FFB6C1","#FFC0CB"],
+  plants:     ["#8A2BE2","#DEB887","#6495ED","#FFF8DC","#B8860B","#556B2F","#FF8C00","#DAA520","#F0FFF0","#E6E6FA","#7CFC00","#FFA07A","#DA70D6","#DB7093","#F5DEB3"],
+  purple:     ["#9370DB","#800080","#663399"],
+  red:        ["#DC143C","#8B0000","#C71585","#FF4500","#DB7093","#FF0000"],
+  threewords: ["#B8860B","#556B2F","#8FBC8F","#483D8B","#2F4F4F","#00BFFF","#FAFAD2","#20B2AA","#87CEFA","#778899","#B0C4DE","#66CDAA","#3CB371","#7B68EE","#EEE8AA","#DB7093"],
+  time:       ["#00FA9A","#191970","#00FF7F"],
+  twowords:   ["#F0F8FF","#7FFFD4","#5F9EA0","#6495ED","#FFF8DC","#E9967A","#00CED1","#FF1493","#1E90FF","#FFFAF0","#F0FFF0","#FF69B4","#ADD8E6","#90EE90","#FFB6C1","#0000CD","#9370DB","#48D1CC","#98FB98","#AFEEEE","#B0E0E6","#9ACD32"],
+  white:      ["#FAEBD7","#FFFAF0","#F8F8FF","#FFDEAD","#FFF5EE","#FFFAFA","#FFFFFF","#F5F5F5"],
+  yellow:     ["#FAFAD2","#FFFFE0","#FFFF00","#9ACD32"],
 };
 
 function hashInt(str: string): number {
@@ -84,41 +89,50 @@ function hashInt(str: string): number {
   return Math.abs(h);
 }
 
+// Convert hex to HSL, then shift toward pastel (high L, reduced S)
+function hexToPastelHsl(hex: string, lBoost = 0): string {
+  const r = parseInt(hex.slice(1,3),16)/255;
+  const g = parseInt(hex.slice(3,5),16)/255;
+  const b = parseInt(hex.slice(5,7),16)/255;
+  const max = Math.max(r,g,b), min = Math.min(r,g,b);
+  let h = 0, s = 0;
+  const l = (max+min)/2;
+  if (max !== min) {
+    const d = max-min;
+    s = l>0.5 ? d/(2-max-min) : d/(max+min);
+    if (max===r) h=((g-b)/d+(g<b?6:0))/6;
+    else if (max===g) h=((b-r)/d+2)/6;
+    else h=((r-g)/d+4)/6;
+  }
+  // Pastelise: pull lightness toward 82%, cap saturation at 50%
+  const newL = Math.round((l*100*0.35 + 82*0.65) + lBoost);
+  const newS = Math.round(Math.min(s*100, 50));
+  return "hsl("+Math.round(h*360)+","+newS+"%,"+newL+"%)";
+}
+
 function pillStyle(song: Song, available: boolean): React.CSSProperties {
   if (!available) return { opacity: 0.4 };
 
   const catId = song.categories?.[0] || "gray";
-  const baseHue = CAT_HUE_MAP[catId] ?? 210;
+  const palette = NC[catId] ?? NC.gray;
   const hash = hashInt(song.yt_id);
 
-  // Variation within the family: ±14° hue, so songs in same column
-  // are clearly related but individually distinct
-  const hueShift = (hash % 29) - 14;
-  const h1 = (baseHue + hueShift + 360) % 360;
-  const h2 = (h1 + 18) % 360;
+  // Pick 2 distinct colors from this category's nagizin palette
+  const c1 = palette[hash % palette.length];
+  const c2 = palette[(hash >> 4) % palette.length] ?? c1;
 
-  // Saturation: low-medium (25–42%), all muted/washed
-  const sat1 = 25 + (hash % 17);
-  const sat2 = sat1 + 5;
-
-  // Lightness: high (78–87%), keeps everything soft
-  const l1 = 78 + ((hash >> 4) % 9);
-  const l2 = l1 - 7;
-
-  // Dark category: invert lightness
   const isDarkCat = catId === "dark" || catId === "time";
   if (isDarkCat) {
-    const ds = 6 + (hash % 10);
-    const dl = 38 + ((hash >> 3) % 14);
+    // Dark categories stay darker — smaller lightness boost
     return {
-      background: "linear-gradient(135deg,hsl(" + h1 + "," + ds + "%," + dl + "%) 0%,hsl(" + h2 + "," + (ds+4) + "%," + (dl-7) + "%) 100%)",
-      color: "#e8e8e8",
+      background: "linear-gradient(135deg," + hexToPastelHsl(c1,-18) + " 0%," + hexToPastelHsl(c2,-20) + " 100%)",
+      color: "#eee",
     };
   }
 
   return {
-    background: "linear-gradient(135deg,hsl(" + h1 + "," + sat1 + "%," + l1 + "%) 0%,hsl(" + h2 + "," + sat2 + "%," + l2 + "%) 100%)",
-    color: "#555",
+    background: "linear-gradient(135deg," + hexToPastelHsl(c1) + " 0%," + hexToPastelHsl(c2,5) + " 100%)",
+    color: "#444",
   };
 }
 
@@ -430,8 +444,8 @@ export default function MusicPlayer() {
   const onSidebarEnter = useCallback((el: HTMLLIElement, song: Song) => {
     if (currentSongRef.current?.yt_id === song.yt_id) return;
     const catId = (song.categories || ["gray"])[0];
-    const baseHue = CAT_HUE_MAP[catId] ?? 210;
-    const color = "hsl(" + baseHue + ",30%,80%)";
+    const palette = NC[catId] ?? NC.gray;
+    const color = hexToPastelHsl(palette[hashInt(song.yt_id) % palette.length]);
     el.style.backgroundColor = color;
   }, []);
 
