@@ -49,8 +49,8 @@ body {
   padding: 0;
   margin: 0;
   width: 248px;
-  height: calc(100vh - 36px);
-  margin-top: 36px;
+  height: calc(100vh - 30px);
+  margin-top: 30px;
   position: fixed;
   border-right: 1px solid #222;
   overflow-y: scroll;
@@ -111,7 +111,7 @@ body {
 .titleContainer {
   position: fixed;
   top: 0;
-  padding: 0 8px;
+  padding: 4px 8px;
   border-bottom: 3px solid #6B4030;
   width: 100%;
   z-index: 10;
@@ -120,12 +120,11 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  height: 36px;
   overflow: hidden;
 }
 h1 {
   margin: 0;
-  font-size: 0.85rem;
+  font-size: 1rem;
   display: inline-block;
   flex-shrink: 0;
   letter-spacing: 0;
@@ -272,7 +271,7 @@ button {
   position: absolute;
   overflow-x: scroll;
   margin-left: 248px;
-  margin-top: 36px;
+  margin-top: 30px;
   scrollbar-width: none;
 }
 .content::-webkit-scrollbar { display: none; }
@@ -290,7 +289,7 @@ button {
   width: 250px;
   flex-shrink: 0;
   border-right: 1px dotted #222;
-  height: calc(100vh - 36px);
+  height: calc(100vh - 30px);
   scrollbar-width: none;
 }
 .category::-webkit-scrollbar { display: none; }
@@ -322,8 +321,6 @@ details:empty::before {
 
 summary {
   border-bottom: 1px dotted black;
-  font-size: 0.8rem;
-  line-height: 1.5;
   list-style: none;
   display: flex;
   align-items: center;
@@ -402,7 +399,6 @@ details.unavailable summary:after {
     margin-top: calc(40vh + 48px);
     margin-left: 0px;
     border-top: 1px solid;
-    height: calc(60vh - 48px);
   }
   .titleContainer {
     font-size: 0.8rem;
