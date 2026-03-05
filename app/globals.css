@@ -107,15 +107,15 @@ body {
   cursor: pointer;
 }
 
-/* ── TITLE BAR — Game & Watch dark maroon aesthetic ── */
+/* ── TITLE BAR ── */
 .titleContainer {
   position: fixed;
   top: 0;
   padding: 4px 8px;
-  border-bottom: 3px solid #6B4030;
+  border-bottom: 1px solid #ddd;
   width: 100%;
   z-index: 10;
-  background-color: #2A1C1C;
+  background-color: #fff;
   font-size: 1rem;
   display: flex;
   align-items: center;
@@ -128,12 +128,12 @@ h1 {
   display: inline-block;
   flex-shrink: 0;
   letter-spacing: 0;
-  color: #ffffff;
+  color: #aaa;
 }
-h1:hover { text-decoration: underline; color: rgba(255,255,255,0.8); }
+h1:hover { text-decoration: underline; color: #888; }
 .nowPlaying {
   font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.85);
+  color: #bbb;
   flex: 1;
   white-space: nowrap;
   overflow: hidden;
@@ -163,41 +163,38 @@ button {
   gap: 2px;
   flex-shrink: 0;
 }
-/* Transport buttons — Game & Watch button style */
+/* Transport buttons */
 .transport-btn {
   cursor: pointer;
   display: inline-block;
-  background-color: #4A3028;
-  border: 1px solid #6B4030;
+  background-color: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.10);
   border-radius: 10px;
   font-size: 0.75rem;
   height: 20px;
   font-family: "AUTHENTICSans-Condensed-90", sans-serif;
   line-height: 1.5;
   padding: 0px 7px;
-  color: #C8B890;
+  color: #bbb;
 }
-.transport-btn:hover { background-color: #5A3A28; color: #E0D0A8; }
-/* Play button = G&W red action button */
+.transport-btn:hover { background-color: rgba(0,0,0,0.10); color: #888; }
 .transport-btn.play-pause {
-  background-color: #CC3300;
-  border-color: #AA2200;
-  color: #FFF0E0;
+  background-color: rgba(0,0,0,0.08);
+  color: #aaa;
   padding: 0px 9px;
 }
-.transport-btn.play-pause:hover { background-color: #EE4400; }
+.transport-btn.play-pause:hover { background-color: rgba(0,0,0,0.14); color: #666; }
 
-/* "View All" button also gets G&W treatment */
 #toggle-button {
-  background-color: #4A3028;
-  border: 1px solid #6B4030;
+  background-color: rgba(0,0,0,0.06);
+  border: 1px solid rgba(0,0,0,0.10);
   border-radius: 10px;
-  color: #C8B890;
+  color: #bbb;
   font-size: 0.7rem;
   height: 20px;
   padding: 0 8px;
 }
-#toggle-button:hover { background-color: #5A3A28; }
+#toggle-button:hover { color: #888; }
 
 /* Live info bar (title + scrubber + time) */
 .live-bar {
@@ -215,15 +212,15 @@ button {
   text-overflow: ellipsis;
   flex-shrink: 1;
   min-width: 0;
-  color: #ffffff;
+  color: #999;
 }
 .live-cat {
-  color: rgba(255, 255, 255, 0.5);
+  color: #ccc;
   font-size: 0.7rem;
 }
 .live-time {
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.55);
+  color: #bbb;
   white-space: nowrap;
   flex-shrink: 0;
   font-variant-numeric: tabular-nums;
@@ -240,10 +237,10 @@ button {
   border-radius: 2px;
   background: linear-gradient(
     to right,
-    #CC3300 0%,
-    #CC3300 var(--pct, 0%),
-    #5A3A28 var(--pct, 0%),
-    #5A3A28 100%
+    rgba(0,0,0,0.25) 0%,
+    rgba(0,0,0,0.25) var(--pct, 0%),
+    rgba(0,0,0,0.08) var(--pct, 0%),
+    rgba(0,0,0,0.08) 100%
   );
   outline: none;
   cursor: pointer;
@@ -253,14 +250,14 @@ button {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #C8B890;
+  background: rgba(0,0,0,0.3);
   cursor: pointer;
 }
 .progress-slider::-moz-range-thumb {
   width: 9px;
   height: 9px;
   border-radius: 50%;
-  background: #C8B890;
+  background: rgba(0,0,0,0.3);
   border: none;
   cursor: pointer;
 }
