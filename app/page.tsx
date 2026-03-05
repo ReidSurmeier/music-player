@@ -120,7 +120,8 @@ export default function MusicPlayer() {
   const currentSongRef = useRef<Song | null>(null);
 
   // Web Audio visualizer refs
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);   // waveform history
+  const barCanvasRef = useRef<HTMLCanvasElement>(null); // frequency bars
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -179,74 +180,97 @@ export default function MusicPlayer() {
   }, []);
 
   const drawVisualizer = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const W = canvas.width;
-    const H = canvas.height;
-    const N_HISTORY = 10;
-
-    ctx.clearRect(0, 0, W, H);
-
     const analyser = analyserRef.current;
 
-    if (analyser) {
-      // Capture current waveform frame
-      const wave = new Float32Array(analyser.fftSize);
-      analyser.getFloatTimeDomainData(wave);
+    // ── 1. WAVEFORM HISTORY (stacked traces, slim-border canvas) ──────────
+    const waveCanvas = canvasRef.current;
+    if (waveCanvas) {
+      const ctx = waveCanvas.getContext("2d");
+      if (ctx) {
+        const W = waveCanvas.width;
+        const H = waveCanvas.height;
+        const N_HISTORY = 10;
+        ctx.clearRect(0, 0, W, H);
 
-      // Push to ring buffer
-      const hist = waveHistoryRef.current;
-      hist.push(wave);
-      if (hist.length > N_HISTORY) hist.shift();
+        if (analyser) {
+          const wave = new Float32Array(analyser.fftSize);
+          analyser.getFloatTimeDomainData(wave);
+          const hist = waveHistoryRef.current;
+          hist.push(wave);
+          if (hist.length > N_HISTORY) hist.shift();
 
-      // Draw stacked history slices: oldest (most faded) at back, newest at front
-      for (let hi = 0; hi < hist.length; hi++) {
-        const progress = hi / Math.max(hist.length - 1, 1); // 0=oldest → 1=newest
-        // Very low opacity overall, newest slice slightly more visible
-        const opacity = 0.04 + progress * 0.22;
-        // Slight vertical stack offset (pseudo-3D depth)
-        const yShift = (hist.length - 1 - hi) * 1.2;
-
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(248, 244, 228, ${opacity})`;
-        ctx.lineWidth = progress > 0.8 ? 1.2 : 0.9;
-
-        const slice = hist[hi];
-        const step = Math.ceil(slice.length / W);
-        for (let x = 0; x < W; x++) {
-          let sum = 0;
-          for (let s = 0; s < step; s++) sum += (slice[x * step + s] ?? 0);
-          const sample = sum / step;
-          const y = H / 2 + sample * (H / 2) * 0.82 + yShift;
-          x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          for (let hi = 0; hi < hist.length; hi++) {
+            const progress = hi / Math.max(hist.length - 1, 1);
+            const opacity = 0.05 + progress * 0.20;
+            const yShift = (hist.length - 1 - hi) * 1.2;
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(0,0,0," + opacity + ")";
+            ctx.lineWidth = progress > 0.8 ? 1.2 : 0.8;
+            const slice = hist[hi];
+            const step = Math.ceil(slice.length / W);
+            for (let x = 0; x < W; x++) {
+              let sum = 0;
+              for (let s = 0; s < step; s++) sum += (slice[x * step + s] ?? 0);
+              const y = H / 2 + (sum / step) * (H / 2) * 0.82 + yShift;
+              x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.stroke();
+          }
+        } else {
+          // Idle drift
+          const t = Date.now() / 4000;
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(0,0,0,0.08)";
+          ctx.lineWidth = 1;
+          for (let x = 0; x < W; x++) {
+            const ph = (x / W) * Math.PI * 3 + t;
+            const y = H / 2 + Math.sin(ph) * H * 0.18 + Math.sin(ph * 0.5) * H * 0.07;
+            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.strokeStyle = "rgba(0,0,0,0.04)";
+          for (let x = 0; x < W; x++) {
+            const ph = (x / W) * Math.PI * 2.3 + t * 0.7 + 1.2;
+            const y = H / 2 + Math.sin(ph) * H * 0.11;
+            x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+          }
+          ctx.stroke();
         }
-        ctx.stroke();
       }
-    } else {
-      // Idle: gentle drifting cosine — cream white, very low opacity
-      const t = Date.now() / 4000;
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(248, 244, 228, 0.10)";
-      ctx.lineWidth = 1;
-      for (let x = 0; x < W; x++) {
-        const phase = (x / W) * Math.PI * 3 + t;
-        const y = H / 2 + Math.sin(phase) * H * 0.18 + Math.sin(phase * 0.5) * H * 0.08;
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+
+    // ── 2. FREQUENCY BARS (classic 20-bar visualizer) ────────────────────
+    const barCanvas = barCanvasRef.current;
+    if (barCanvas) {
+      const bctx = barCanvas.getContext("2d");
+      if (bctx) {
+        const W = barCanvas.width;
+        const H = barCanvas.height;
+        bctx.clearRect(0, 0, W, H);
+
+        if (analyser) {
+          // Use a separate smaller FFT for bar display
+          const bins = 64;
+          const freq = new Uint8Array(bins);
+          analyser.getByteFrequencyData(freq);
+          const start = 2, end = 22, count = end - start;
+          const gap = 1;
+          const barW = Math.floor((W - gap * (count - 1)) / count);
+          for (let i = 0; i < count; i++) {
+            const val = freq[start + i] / 255;
+            const barH = Math.max(1, Math.round(val * H));
+            const x = i * (barW + gap);
+            const opacity = 0.08 + val * 0.22;
+            bctx.fillStyle = "rgba(0,0,0," + opacity + ")";
+            bctx.fillRect(x, H - barH, barW, barH);
+          }
+        } else {
+          // Idle: flat baseline
+          bctx.fillStyle = "rgba(0,0,0,0.05)";
+          bctx.fillRect(0, H - 1, W, 1);
+        }
       }
-      ctx.stroke();
-      // Second faint layer shifted
-      ctx.beginPath();
-      ctx.strokeStyle = "rgba(248, 244, 228, 0.05)";
-      for (let x = 0; x < W; x++) {
-        const phase = (x / W) * Math.PI * 2.3 + t * 0.7 + 1.2;
-        const y = H / 2 + Math.sin(phase) * H * 0.12;
-        x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-      }
-      ctx.stroke();
     }
 
     animFrameRef.current = requestAnimationFrame(drawVisualizer);
@@ -445,11 +469,22 @@ export default function MusicPlayer() {
           <button className="transport-btn" onClick={playNext} title="Next (→)">⏭</button>
         </div>
 
-        {/* Waveform history visualizer — always visible */}
+        {/* Waveform history — slim outlined border */}
+        <div style={{
+          border: "1px solid rgba(0,0,0,0.12)",
+          borderRadius: 3,
+          overflow: "hidden",
+          flexShrink: 0,
+          display: "flex",
+          alignItems: "center",
+        }}>
+          <canvas ref={canvasRef} width={160} height={22} style={{ display: "block" }} />
+        </div>
+        {/* Frequency bars */}
         <canvas
-          ref={canvasRef}
-          width={200}
-          height={24}
+          ref={barCanvasRef}
+          width={80}
+          height={22}
           style={{ flexShrink: 0, display: "block" }}
         />
 
