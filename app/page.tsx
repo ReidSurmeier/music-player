@@ -31,20 +31,60 @@ const LABEL_MAP: Record<string,string> = {
   threewords:"Three Words", twowords:"Two Words", oneword:"One Word",
 };
 
+// Colors sampled from reidsurmeier.garden/fj09304u2.png (IRC client screenshot)
+// Palette: dark purple title, lavender sidebar, IRC username colors (green/red/blue/teal/orange)
 const CAT_BG: Record<string,string> = {
-  edible:"BurlyWood", fruit:"Orange", dessert:"PeachPuff", people:"AliceBlue",
-  floral:"Lavender", gemstones:"Turquoise", location:"Peru", alcohol:"Chartreuse",
-  animal:"Tan", plants:"LawnGreen", nature:"MediumSeaGreen", metals:"Silver",
-  elements:"Aqua", artifact:"AntiqueWhite", fabric:"Linen", time:"MediumSpringGreen",
-  mid:"MediumAquaMarine", pale:"PaleGoldenRod", light:"LightYellow", dark:"DarkSlateGray",
-  deep:"DeepSkyBlue", red:"Crimson", yellow:"Yellow", pink:"HotPink", orange:"DarkOrange",
-  purple:"MediumPurple", green:"LimeGreen", blue:"CornflowerBlue", brown:"SaddleBrown",
-  white:"WhiteSmoke", gray:"Gray", threewords:"LightSteelBlue", twowords:"LightBlue",
-  oneword:"PowderBlue",
+  edible:     "#CC6600", // IRC orange/brown username
+  fruit:      "#008000", // IRC green username
+  dessert:    "#FF69B4", // emote pink/magenta
+  people:     "#DCD0E8", // sidebar lavender
+  floral:     "#E8E0F0", // light lavender sidebar
+  gemstones:  "#FFD700", // moderator gold icon
+  location:   "#000080", // dark navy blue username
+  alcohol:    "#8FBC8F", // muted IRC green
+  animal:     "#CC6600", // orange/brown
+  plants:     "#008000", // green
+  nature:     "#008080", // teal/cyan username
+  metals:     "#C0C0C0", // tab bar silver gray
+  elements:   "#D4D0C8", // menu bar light gray
+  artifact:   "#F0F0F0", // window off-white
+  fabric:     "#DCD0E8", // lavender
+  time:       "#4B0082", // title bar dark purple (light text needed)
+  mid:        "#800080", // IRC purple username
+  pale:       "#F0F0F0", // window off-white
+  light:      "#FFFFFF", // white
+  dark:       "#3A0066", // deep title-bar purple (light text needed)
+  deep:       "#000080", // dark blue
+  red:        "#CC0000", // IRC red username
+  yellow:     "#FFD700", // gold
+  pink:       "#FF69B4", // pink
+  orange:     "#CC6600", // orange
+  purple:     "#800080", // IRC purple
+  green:      "#008000", // IRC green
+  blue:       "#0000CD", // IRC blue username
+  brown:      "#8B4513", // emote brown hair
+  white:      "#F0F0F0", // off-white
+  gray:       "#A0A0A0", // scrollbar gray
+  threewords: "#E8E0F0", // light lavender
+  twowords:   "#DCD0E8", // lavender
+  oneword:    "#C8C0D8", // slightly deeper lavender
 };
 
 function catLabel(id: string) {
   return LABEL_MAP[id] || (id.charAt(0).toUpperCase() + id.slice(1));
+}
+
+// Dark bg colors that need white text on the pill
+const DARK_CATS = new Set(["time","dark","deep","blue","green","location","purple","red","brown","mid"]);
+
+function pillStyle(catId: string, available: boolean): React.CSSProperties {
+  if (!available) return {};
+  const bg = CAT_BG[catId] || "#ddd";
+  const dark = DARK_CATS.has(catId);
+  return {
+    backgroundColor: bg,
+    color: dark ? "#f0f0f0" : "#000",
+  };
 }
 
 function cleanTitle(title: string) {
@@ -270,7 +310,7 @@ export default function MusicPlayer() {
 
       {/* ── TITLE BAR ─────────────────────────────────────────────── */}
       <section className="titleContainer">
-        <a href="#"><h1>SOUND__</h1></a>
+        <a href="#"><h1>♫⋆｡ Reid's ‧₊˚♪⊹₊⋆ Playlists ˚♬ ﾟ.</h1></a>
 
         <button id="toggle-button" onClick={toggleAll}>
           {allOpen ? "Hide All" : "View All"}
@@ -354,14 +394,13 @@ export default function MusicPlayer() {
             >
               <h2>{col.label}</h2>
               {col.songs.map(song => {
-                const bg = CAT_BG[col.id] || "LightGray";
                 const isActive = currentSong?.yt_id === song.yt_id;
                 const isErr = errored.has(song.yt_id);
                 return (
                   <details
                     key={song.yt_id}
                     className={isErr ? "unavailable" : ""}
-                    style={!isErr ? { backgroundColor: bg } : {}}
+                    style={pillStyle(col.id, !isErr)}
                     ref={el => { detailsRefs.current[song.yt_id] = el; }}
                   >
                     <summary

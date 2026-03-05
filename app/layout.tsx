@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "SOUND__",
-  description: "A music player built from Reid Surmeier's Are.na channel",
+  title: "♫ Reid's Playlists",
+  description: "Reid Surmeier's music player — styled after nagizin.xyz, sourced from Are.na",
 };
 
 export default function RootLayout({
