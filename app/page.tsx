@@ -110,8 +110,14 @@ export default function MusicPlayer() {
   const contentRef = useRef<HTMLElement>(null);
   const colRefs = useRef<Record<string, HTMLDivElement | null>>({});
   const detailsRefs = useRef<Record<string, HTMLDetailsElement | null>>({});
-  // Ref always holds latest currentSong — avoids stale closure in setTimeout
   const currentSongRef = useRef<Song | null>(null);
+
+  // Web Audio visualizer refs
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
+  const animFrameRef = useRef<number>(0);
 
   const [songs, setSongs] = useState<Song[]>([]);
   const [columns, setColumns] = useState<Column[]>([]);
@@ -143,6 +149,81 @@ export default function MusicPlayer() {
       });
   }, []);
 
+  // ── Web Audio visualizer ─────────────────────────────────────────
+  const setupAnalyser = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio || sourceNodeRef.current) return; // only connect once
+    try {
+      const ctx = new AudioContext();
+      const analyser = ctx.createAnalyser();
+      analyser.fftSize = 64;         // 32 frequency bins — Spotify-style bar count
+      analyser.smoothingTimeConstant = 0.8;
+      const source = ctx.createMediaElementSource(audio);
+      source.connect(analyser);
+      analyser.connect(ctx.destination);
+      audioCtxRef.current = ctx;
+      analyserRef.current = analyser;
+      sourceNodeRef.current = source;
+    } catch (e) {
+      console.warn("AudioContext setup failed:", e);
+    }
+  }, []);
+
+  const drawVisualizer = useCallback(() => {
+    const canvas = canvasRef.current;
+    const analyser = analyserRef.current;
+    if (!canvas || !analyser) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const bins = analyser.frequencyBinCount; // 32
+    const data = new Uint8Array(bins);
+    analyser.getByteFrequencyData(data);
+
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // Draw ~20 bars in the center frequency range (skip very low/high bins)
+    const start = 2;
+    const end = 22;
+    const count = end - start;
+    const gap = 1;
+    const barW = Math.floor((W - gap * (count - 1)) / count);
+
+    for (let i = 0; i < count; i++) {
+      const val = data[start + i] / 255;
+      const barH = Math.max(2, Math.round(val * H));
+      const x = i * (barW + gap);
+      const y = H - barH;
+      // Color: same IRC dark purple from the palette
+      ctx.fillStyle = val > 0.6 ? "#4B0082" : val > 0.3 ? "#800080" : "#DCD0E8";
+      ctx.fillRect(x, y, barW, barH);
+    }
+
+    animFrameRef.current = requestAnimationFrame(drawVisualizer);
+  }, []);
+
+  // Start/stop draw loop with playback state
+  useEffect(() => {
+    if (isPlaying && analyserRef.current) {
+      // Resume AudioContext if suspended (browser policy)
+      audioCtxRef.current?.resume();
+      cancelAnimationFrame(animFrameRef.current);
+      animFrameRef.current = requestAnimationFrame(drawVisualizer);
+    } else {
+      cancelAnimationFrame(animFrameRef.current);
+      // Draw flat line when paused
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        ctx?.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+    return () => cancelAnimationFrame(animFrameRef.current);
+  }, [isPlaying, drawVisualizer]);
+
   // ── Play a song ──────────────────────────────────────────────────
   const playSong = useCallback((song: Song, colSongs?: Song[]) => {
     const audio = audioRef.current;
@@ -155,6 +236,9 @@ export default function MusicPlayer() {
     Object.values(detailsRefs.current).forEach(el => { if (el) el.open = false; });
     const det = detailsRefs.current[song.yt_id];
     if (det) det.open = true;
+
+    // Setup Web Audio on first interaction (requires user gesture)
+    setupAnalyser();
 
     audio.src = `/music-player/audio/${song.yt_id}.mp3`;
     audio.load();
@@ -324,6 +408,18 @@ export default function MusicPlayer() {
           </button>
           <button className="transport-btn" onClick={playNext} title="Next (→)">⏭</button>
         </div>
+
+        {/* Visualizer canvas */}
+        <canvas
+          ref={canvasRef}
+          width={80}
+          height={22}
+          style={{
+            flexShrink: 0,
+            display: currentSong && isPlaying ? "block" : "none",
+            imageRendering: "pixelated",
+          }}
+        />
 
         {/* Now playing info + progress */}
         {currentSong ? (
