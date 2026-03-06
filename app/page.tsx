@@ -512,7 +512,9 @@ export default function MusicPlayer() {
         <div className="transport">
           <button className="transport-btn" onClick={playPrev} title="Previous (←)">⏮</button>
           <button className="transport-btn play-pause" onClick={togglePlayPause} title="Play/Pause (Space)">
-            {isPlaying ? "⏸" : "▶"}
+            {isPlaying
+              ? <span className="soundbars"><span/><span/><span/><span/></span>
+              : "▶"}
           </button>
           <button className="transport-btn" onClick={playNext} title="Next (→)">⏭</button>
         </div>
@@ -559,6 +561,13 @@ export default function MusicPlayer() {
         ) : (
           <span className="nowPlaying">Nothing playing. Click a song to begin.</span>
         )}
+        {/* Grayscale gif — right side of title bar */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://d2w9rnfcy7mm78.cloudfront.net/10483272/original_6c20fd1a010bb5c6e5df5789483d28e8.gif?1611983047?bc=0"
+          alt=""
+          className="title-gif"
+        />
       </section>
 
       {/* ── SIDEBAR — master track list ───────────────────────────── */}
