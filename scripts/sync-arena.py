@@ -87,28 +87,29 @@ def fetch_arena_songs():
             break
     return all_songs
 
+def word_count_category(title):
+    """Categorize by word count in song title: oneword / twowords / threewords."""
+    import re
+    t = re.sub(r'\s*[-\u2013]\s*YouTube\s*$', '', title, flags=re.IGNORECASE)
+    t = re.sub(r'\[.*?\]', '', t)
+    t = re.sub(r'\(.*?\)', '', t)
+    if ' - ' in t:
+        parts = [p.strip() for p in t.split(' - ') if p.strip()]
+        t = parts[-1] if parts else t
+    t = t.strip()
+    filler = {'&', 'x', 'X', 'feat.', 'ft.', 'b2b'}
+    words = [w for w in t.split() if w and w not in filler]
+    n = len(words)
+    if n <= 1:
+        return 'oneword'
+    elif n == 2:
+        return 'twowords'
+    else:
+        return 'threewords'
+
 def categorize_songs(new_songs):
-    """Use Gemini to assign categories to new songs."""
-    if not new_songs:
-        return {}
-    songs_list = "\n".join([
-        f"{i+1}. [{s['yt_id']}] {s['title'][:70]}"
-        for i,s in enumerate(new_songs)
-    ])
-    prompt = f"""Categorize these songs into 1-2 vibe categories each from: {', '.join(CATEGORY_ORDER)}.
-Vibes: deep=deep house/bass, brown=hip-hop/soul, elements=minimal electronic, dark=dark ambient,
-floral=delicate ambient, mid=midtempo hip-hop, nature=organic ambient, gemstones=crystalline electronic,
-alcohol=late-night jazz/trip-hop, blue=melancholic, green=chill organic, red=energetic/passionate.
-Songs:
-{songs_list}
-Return ONLY JSON: [{{"yt_id":"ID","categories":["cat1","cat2"]}}]"""
-    try:
-        result = gemini(prompt)
-        cats = json.loads(result)
-        return {c["yt_id"]: c["categories"] for c in cats}
-    except Exception as e:
-        log(f"Gemini categorize error: {e}")
-        return {}
+    """Categorize new songs by title word count into oneword/twowords/threewords."""
+    return {s['yt_id']: [word_count_category(s['title'])] for s in new_songs}
 
 def get_metadata(new_songs):
     """Use Gemini to extract album/year/label for new songs."""
