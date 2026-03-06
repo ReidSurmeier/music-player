@@ -166,8 +166,9 @@ export default function MusicPlayer() {
   const currentSongRef = useRef<Song | null>(null);
 
   // Web Audio visualizer refs
-  const canvasRef = useRef<HTMLCanvasElement>(null);   // waveform history
-  const barCanvasRef = useRef<HTMLCanvasElement>(null); // frequency bars
+  const canvasRef = useRef<HTMLCanvasElement>(null);      // waveform history (desktop)
+  const barCanvasRef = useRef<HTMLCanvasElement>(null);   // frequency bars (desktop)
+  const mobileVizRef = useRef<HTMLCanvasElement>(null);   // big mobile visualizer
   const audioCtxRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
@@ -315,6 +316,64 @@ export default function MusicPlayer() {
           // Idle: flat baseline
           bctx.fillStyle = "rgba(0,0,0,0.05)";
           bctx.fillRect(0, H - 1, W, 1);
+        }
+      }
+    }
+
+    // ── 3. MOBILE VISUALIZER (large centered oscilloscope) ───────────────
+    const mViz = mobileVizRef.current;
+    if (mViz) {
+      const mc = mViz.getContext("2d");
+      if (mc) {
+        const W = mViz.width;
+        const H = mViz.height;
+        mc.clearRect(0, 0, W, H);
+        if (analyser) {
+          const wave = new Float32Array(analyser.fftSize);
+          analyser.getFloatTimeDomainData(wave);
+          // Draw stacked waveform traces
+          const N = 8;
+          for (let hi = 0; hi < N; hi++) {
+            const progress = hi / (N - 1);
+            const opacity = 0.04 + progress * 0.22;
+            const yShift = (N - 1 - hi) * 2.5;
+            mc.beginPath();
+            mc.strokeStyle = "rgba(0,0,0," + opacity + ")";
+            mc.lineWidth = progress > 0.7 ? 1.5 : 0.9;
+            const step = Math.ceil(wave.length / W);
+            for (let x = 0; x < W; x++) {
+              let sum = 0;
+              for (let s = 0; s < step; s++) sum += (wave[x * step + s] ?? 0);
+              // Older traces: compressed; newest: full amplitude
+              const amp = (0.4 + progress * 0.55) * (H / 2) * 0.88;
+              const y = H / 2 + (sum / step) * amp + yShift;
+              x === 0 ? mc.moveTo(x, y) : mc.lineTo(x, y);
+            }
+            mc.stroke();
+          }
+          // Frequency bars across the bottom quarter
+          const freq = new Uint8Array(64);
+          analyser.getByteFrequencyData(freq);
+          const count = 28, gap = 2, barW = Math.floor((W - gap * (count - 1)) / count);
+          for (let i = 0; i < count; i++) {
+            const val = freq[i + 2] / 255;
+            const barH = Math.max(2, Math.round(val * H * 0.22));
+            const x = i * (barW + gap);
+            mc.fillStyle = "rgba(0,0,0," + (0.06 + val * 0.20) + ")";
+            mc.fillRect(x, H - barH, barW, barH);
+          }
+        } else {
+          // Idle: gentle sine drift
+          const t = Date.now() / 3000;
+          mc.beginPath();
+          mc.strokeStyle = "rgba(0,0,0,0.08)";
+          mc.lineWidth = 1.2;
+          for (let x = 0; x < W; x++) {
+            const ph = (x / W) * Math.PI * 3 + t;
+            const y = H / 2 + Math.sin(ph) * H * 0.12 + Math.sin(ph * 0.5 + 1) * H * 0.05;
+            x === 0 ? mc.moveTo(x, y) : mc.lineTo(x, y);
+          }
+          mc.stroke();
         }
       }
     }
@@ -470,12 +529,15 @@ export default function MusicPlayer() {
     return () => window.removeEventListener("keydown", h);
   }, [togglePlayPause, playNext, playPrev]);
 
-  // ── Window resize reload (nagizin behavior) ────────────────────
+  // ── Window resize: update mobile viz canvas size ───────────────
   useEffect(() => {
-    let t: ReturnType<typeof setTimeout>;
-    const h = () => { clearTimeout(t); t = setTimeout(() => location.reload(), 300); };
-    window.addEventListener("resize", h);
-    return () => window.removeEventListener("resize", h);
+    const update = () => {
+      const c = mobileVizRef.current;
+      if (c) { c.width = window.innerWidth; c.height = window.innerHeight - 40 - 110; }
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
   }, []);
 
   const cat = currentSong ? (currentSong.categories || ["gray"])[0] : null;
@@ -654,6 +716,44 @@ export default function MusicPlayer() {
           ))}
         </div>
       </section>
+
+      {/* ── MOBILE VISUALIZER ─────────────────────────────────────── */}
+      <canvas
+        ref={mobileVizRef}
+        className="mobile-viz"
+        width={390}
+        height={300}
+      />
+
+      {/* ── MOBILE BOTTOM CONTROLS ────────────────────────────────── */}
+      <div className="mobile-controls">
+        <div className="mobile-row1">
+          <button className="transport-btn" onClick={playPrev}>⏮</button>
+          <button className="transport-btn play-pause" onClick={togglePlayPause}>
+            {isPlaying
+              ? <span className="soundbars"><span/><span/><span/><span/></span>
+              : "▶"}
+          </button>
+          <button className="transport-btn" onClick={playNext}>⏭</button>
+          <span className="mobile-now-playing">
+            {currentSong ? cleanTitle(currentSong.title) : "Nothing playing"}
+          </span>
+        </div>
+        <div className="mobile-row2">
+          <span className="live-time">{fmtTime(currentTime)}</span>
+          <input
+            className="progress-slider"
+            type="range"
+            min={0}
+            max={duration || 100}
+            step={0.1}
+            value={currentTime}
+            onChange={handleSeek}
+            style={{ "--pct": `${progress}%` } as React.CSSProperties}
+          />
+          <span className="live-time">{fmtTime(duration)}</span>
+        </div>
+      </div>
     </>
   );
 }

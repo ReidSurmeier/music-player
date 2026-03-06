@@ -412,44 +412,114 @@ details.unavailable summary:after {
   }
 }
 
+/* ── Mobile visualizer + bottom controls (hidden on desktop) ── */
+.mobile-viz {
+  display: none;
+}
+.mobile-controls {
+  display: none;
+}
+
 @media (max-width: 760px) {
-  .colorList {
-    margin-top: 44px;
-    height: 41%;
-    width: 100%;
-    border-right: 0px solid;
-    flex-direction: row;
-    overflow-x: scroll;
-    overflow-y: hidden;
-  }
-  .colorList li {
-    min-width: 180px;
-    border-right: 1px solid #222;
-    border-bottom: none;
-  }
-  .content {
-    position: fixed;
-    margin-top: calc(40vh + 48px);
-    margin-left: 0px;
-    border-top: 1px solid;
-  }
+  /* Title bar: minimal — just the logo */
   .titleContainer {
     font-size: 0.8rem;
-    padding: 2px 4px;
-    height: auto;
+    padding: 2px 8px;
+    height: 40px;
+    flex-wrap: nowrap;
+    overflow: hidden;
   }
-  h1 { font-size: 15px; }
-  summary { font-size: 0.8rem; }
-  h2 { font-size: 15px; }
-  .category {
-    width: 200px;
-    background-color: white;
+  /* Hide desktop-only elements from title bar */
+  .titleContainer .transport,
+  .titleContainer .live-bar,
+  .titleContainer .nowPlaying,
+  .titleContainer .title-gif,
+  .titleContainer canvas,
+  .titleContainer div[style*="border"] {
+    display: none !important;
   }
+  h1 { font-size: 14px; }
+  #toggle-button { display: none; }
+
+  /* Song list: horizontal scroll strip below title bar */
+  .colorList {
+    margin-top: 40px;
+    height: calc(100vh - 40px - 110px); /* full height minus title and bottom controls */
+    width: 100%;
+    border-right: none;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+  .colorList li {
+    min-width: unset;
+    border-right: none;
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+  }
+
+  /* Hide the column content on mobile */
+  .content { display: none; }
+
+  /* Big mobile visualizer — fills middle */
+  .mobile-viz {
+    display: block;
+    position: fixed;
+    right: 0;
+    bottom: 110px;
+    width: 100vw;
+    height: calc(100vh - 40px - 110px);
+    background: transparent;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* Mobile bottom controls — 2 rows fixed to bottom */
+  .mobile-controls {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 110px;
+    background: #fff;
+    border-top: 1px solid #ddd;
+    padding: 8px 12px 10px;
+    z-index: 20;
+    gap: 4px;
+  }
+  .mobile-row1 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobile-now-playing {
+    font-family: 'AUTHENTICSans-90', sans-serif;
+    font-size: 0.75rem;
+    color: #999;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+  }
+  .mobile-row2 {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mobile-row2 .progress-slider {
+    flex: 1;
+  }
+  .mobile-row2 .live-time {
+    font-size: 0.7rem;
+    color: #bbb;
+    white-space: nowrap;
+  }
+
   figure { padding: 0; margin: 0 30px; }
   figcaption { font-size: 0.7rem; }
 }
 
 @media (max-width: 499px) {
-  .colorList { margin-top: 58px; }
-  .content { margin-top: calc(40vh + 0px); }
+  .colorList { margin-top: 40px; }
 }
