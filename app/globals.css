@@ -421,7 +421,7 @@ details.unavailable summary:after {
 }
 
 @media (max-width: 760px) {
-  /* Title bar: minimal — just the logo */
+  /* Title bar: compact */
   .titleContainer {
     font-size: 0.8rem;
     padding: 2px 8px;
@@ -429,7 +429,6 @@ details.unavailable summary:after {
     flex-wrap: nowrap;
     overflow: hidden;
   }
-  /* Hide desktop-only elements from title bar */
   .titleContainer .transport,
   .titleContainer .live-bar,
   .titleContainer .nowPlaying,
@@ -441,36 +440,77 @@ details.unavailable summary:after {
   h1 { font-size: 14px; }
   #toggle-button { display: none; }
 
-  /* Song list: horizontal scroll strip below title bar */
-  .colorList {
-    margin-top: 40px;
-    height: calc(100vh - 40px - 110px); /* full height minus title and bottom controls */
-    width: 100%;
-    border-right: none;
+  /* Hide the sidebar on mobile */
+  .colorList { display: none; }
+
+  /* Content becomes full-width, 2 horizontal scrolling rows */
+  .content {
+    position: fixed;
+    top: 40px;
+    left: 0;
+    right: 0;
+    bottom: 110px;
+    margin: 0;
+    display: flex;
     flex-direction: column;
-    overflow-x: hidden;
-    overflow-y: scroll;
-  }
-  .colorList li {
-    min-width: unset;
-    border-right: none;
-    border-bottom: 1px solid rgba(0,0,0,0.08);
+    overflow: hidden;
   }
 
-  /* Hide the column content on mobile */
-  .content { display: none; }
+  #categoryContainer {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    height: 100%;
+  }
 
-  /* Big mobile visualizer — fills middle */
+  /* Each category becomes a horizontal scrolling row */
+  .category {
+    flex: 1;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .category h2 {
+    writing-mode: vertical-lr;
+    text-orientation: mixed;
+    font-size: 11px;
+    color: #bbb;
+    flex-shrink: 0;
+    margin: 0 2px 0 0;
+    padding: 0;
+    letter-spacing: 0.5px;
+  }
+  .category details {
+    flex-shrink: 0;
+  }
+  .category details summary {
+    font-size: 0.75rem;
+    white-space: nowrap;
+  }
+
+  /* Mobile visualizer — centered between rows */
   .mobile-viz {
     display: block;
     position: fixed;
+    top: 40px;
+    left: 0;
     right: 0;
     bottom: 110px;
     width: 100vw;
-    height: calc(100vh - 40px - 110px);
+    height: auto;
     background: transparent;
     pointer-events: none;
-    z-index: 5;
+    z-index: 2;
+    opacity: 0.4;
   }
 
   /* Mobile bottom controls — 2 rows fixed to bottom */
@@ -507,19 +547,17 @@ details.unavailable summary:after {
     align-items: center;
     gap: 6px;
   }
-  .mobile-row2 .progress-slider {
-    flex: 1;
-  }
+  .mobile-row2 .progress-slider { flex: 1; }
   .mobile-row2 .live-time {
     font-size: 0.7rem;
     color: #bbb;
     white-space: nowrap;
   }
 
-  figure { padding: 0; margin: 0 30px; }
+  figure { padding: 0; margin: 0 12px; }
   figcaption { font-size: 0.7rem; }
 }
 
 @media (max-width: 499px) {
-  .colorList { margin-top: 40px; }
+  .titleContainer { height: 36px; }
 }
