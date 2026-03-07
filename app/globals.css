@@ -458,138 +458,220 @@ details.unavailable summary:after {
   }
 }
 
-/* ── Mobile now card + transport: hidden on desktop ── */
-.mobile-now-card { display: none; }
-.mobile-controls  { display: none; }
-.mobile-viz       { display: none; }
+/* ── Mobile elements: hidden on desktop ── */
+.mobile-now-card     { display: none; }
+.mobile-progress-row { display: none; }
+.mobile-controls     { display: none; }
+.mobile-viz          { display: none; }
 
 @media (max-width: 760px) {
   /* ── Hide desktop chrome ── */
   .titleContainer { display: none !important; }
   .colorList      { display: none; }
 
-  /* ── NOW PLAYING CARD — fixed top, 190px ── */
+  /* ══════════════════════════════════════════
+     NOW PLAYING CARD
+     Floats with margins, pill corners, gradient bg
+     Height: 200px total (180px inner + 10px top/bottom margins)
+  ══════════════════════════════════════════ */
   .mobile-now-card {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 190px;
+    height: 200px;
     z-index: 30;
-    padding: 16px 16px 12px;
-    border-radius: 0 0 16px 16px;
-    background: #f0f0f0;
-    transition: background 0.5s ease;
-    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 10px;          /* margin that reveals white behind card */
+    background: transparent; /* outer wrapper is transparent */
+    pointer-events: none;
   }
-  .mobile-card-inner {
+  /* The inner card is the visual pill */
+  .mobile-now-card > * {
+    pointer-events: auto;
+  }
+  /* Wrap the card contents in a pill via pseudo — achieved by making
+     the card itself the pill, using padding to simulate margins */
+  .mobile-now-card {
+    background: transparent;
+  }
+  /* card pill shape applied to the whole section via outline trick:
+     use box-shadow on a wrapper div instead — simpler: just give the
+     mobile-now-card itself the pill + gradient, then add white page bg */
+
+  /* Override: make the outer element a transparent spacer */
+  /* Inner card pill: achieved by making a single styled card element */
+  .mobile-card-pill {
+    flex: 1;
+    border-radius: 22px;
+    padding: 14px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #eee; /* overridden by inline style */
+    transition: background 0.5s ease;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.10);
+    overflow: hidden;
+  }
+  .mobile-card-header {
     display: flex;
     align-items: center;
-    gap: 14px;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
+    gap: 8px;
   }
-  .mobile-thumb {
-    width: 80px;
-    height: 80px;
-    object-fit: cover;
-    border-radius: 8px;
+  .mobile-drag {
+    font-size: 1rem;
+    color: rgba(0,0,0,0.3);
     flex-shrink: 0;
-    opacity: 0.9;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
-  }
-  .mobile-card-info {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
+    line-height: 1;
   }
   .mobile-card-title {
-    font-size: 1rem;
     font-family: 'AUTHENTICSans-90', sans-serif;
-    font-weight: 600;
-    color: rgba(0,0,0,0.78);
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: rgba(0,0,0,0.8);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    line-height: 1.3;
+    flex: 1;
+  }
+  .mobile-thumb {
+    width: 72px;
+    height: 72px;
+    object-fit: cover;
+    border-radius: 8px;
+    align-self: center;
+    flex-shrink: 0;
+    opacity: 0.92;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display: block;
+    margin: 0 auto;
   }
   .mobile-card-meta {
     font-size: 0.68rem;
-    color: rgba(0,0,0,0.5);
-    margin-top: 5px;
+    color: rgba(0,0,0,0.55);
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     line-height: 1.45;
   }
-  .mobile-card-cat {
-    color: rgba(0,0,0,0.35);
-  }
+  .mobile-card-cat { color: rgba(0,0,0,0.35); }
   .mobile-card-empty {
     flex: 1;
     display: flex;
     align-items: center;
-    font-size: 0.85rem;
+    justify-content: center;
+    font-size: 0.9rem;
     color: rgba(0,0,0,0.35);
-    letter-spacing: 0.02em;
   }
-  .mobile-card-progress {
+
+  /* ══════════════════════════════════════════
+     PROGRESS ROW — below card, white bg
+  ══════════════════════════════════════════ */
+  .mobile-progress-row {
     display: flex;
     align-items: center;
-    gap: 7px;
-    padding-top: 8px;
+    gap: 6px;
+    position: fixed;
+    top: 200px;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: #fff;
+    padding: 0 12px;
+    z-index: 28;
+    border-bottom: 1px solid rgba(218,165,32,0.4); /* gold separator like ref */
   }
-  .mobile-card-progress .live-time {
-    font-size: 0.65rem;
-    color: rgba(0,0,0,0.4);
+  .mobile-progress-label {
+    font-size: 0.62rem;
+    color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 90px;
+    flex-shrink: 1;
+  }
+  .mobile-progress-row .live-time {
+    font-size: 0.62rem;
+    color: #bbb;
     white-space: nowrap;
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
   }
-  .mobile-card-progress .progress-slider {
+  .mobile-progress-row .progress-slider {
     flex: 1;
     max-width: none;
+    min-width: 40px;
   }
 
-  /* ── TRANSPORT ROW — fixed below card, 46px ── */
+  /* ══════════════════════════════════════════
+     TRANSPORT ROW — outlined circle buttons
+  ══════════════════════════════════════════ */
   .mobile-controls {
     display: flex;
     flex-direction: row;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 10px;
     position: fixed;
-    top: 190px;
+    top: 230px;
     left: 0;
     right: 0;
-    height: 46px;
+    height: 52px;
     background: #fff;
-    border-bottom: 1px solid rgba(0,0,0,0.07);
+    border-bottom: 1px solid rgba(0,0,0,0.06);
     padding: 0 14px;
-    z-index: 29;
+    z-index: 27;
   }
   .mobile-title-deco {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: #ccc;
     margin: 0;
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
-    letter-spacing: 0;
+  }
+  /* Outlined circle transport buttons */
+  .mobile-transport-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(0,0,0,0.18);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    font-size: 0.75rem;
+    color: #999;
+    cursor: pointer;
+    flex-shrink: 0;
+    font-family: inherit;
+  }
+  .mobile-transport-btn:hover { border-color: rgba(0,0,0,0.35); color: #555; }
+  .mobile-transport-btn.active {
+    border-color: rgba(0,0,0,0.4);
+    color: #444;
+    background: rgba(0,0,0,0.05);
+  }
+  .mobile-play-btn {
+    width: 38px;
+    height: 38px;
+    font-size: 0.85rem;
+    border-width: 2px;
   }
   .mobile-controls .volume-slider {
-    width: 70px;
+    width: 60px;
     flex-shrink: 0;
   }
 
-  /* ── PLAYLIST COLUMNS — horizontal scroll ── */
+  /* ══════════════════════════════════════════
+     PLAYLIST COLUMNS — exactly 2 visible (50vw each)
+  ══════════════════════════════════════════ */
   .content {
     position: fixed;
-    top: 236px;
+    top: 282px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -607,28 +689,31 @@ details.unavailable summary:after {
   }
 
   .category {
-    width: 170px !important;
+    width: 50vw !important;
     height: 100% !important;
     overflow-y: scroll;
     overflow-x: hidden;
     flex-shrink: 0;
-    border-right: 1px dotted rgba(0,0,0,0.15);
+    border-right: 1px solid rgba(0,0,0,0.12);
     padding-bottom: 24px;
     display: block !important;
   }
   .category h2 {
     font-size: 13px;
-    padding: 6px 6px 3px;
+    padding: 6px 8px 4px;
     position: sticky;
     top: 0;
     background: #fff;
     writing-mode: horizontal-tb;
     color: #333;
     border-bottom: 2px dotted #ddd;
+    border-left: 3px solid #333;
     z-index: 1;
+    letter-spacing: 0.01em;
   }
   .category details {
-    padding: 4px 5px 0 6px;
+    padding: 3px 5px 0 6px;
+    border-radius: 40px;
   }
   .category details summary {
     font-size: 0.72rem;

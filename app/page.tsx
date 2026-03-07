@@ -766,61 +766,69 @@ export default function MusicPlayer() {
       </section>
 
       {/* ── MOBILE NOW PLAYING CARD ───────────────────────────────── */}
-      <div
-        className="mobile-now-card"
-        style={currentSong ? { background: songGradient(currentSong) } : {}}
-      >
-        {currentSong ? (
-          <>
-            <div className="mobile-card-inner">
+      <div className="mobile-now-card">
+        <div
+          className="mobile-card-pill"
+          style={currentSong ? { background: songGradient(currentSong) } : {}}
+        >
+          {currentSong ? (
+            <>
+              <div className="mobile-card-header">
+                <span className="mobile-drag">⠿</span>
+                <span className="mobile-card-title">{cleanTitle(currentSong.title)}</span>
+              </div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={currentSong.thumbnail}
                 alt={cleanTitle(currentSong.title)}
                 className="mobile-thumb"
               />
-              <div className="mobile-card-info">
-                <div className="mobile-card-title">{cleanTitle(currentSong.title)}</div>
-                <div className="mobile-card-meta">
-                  {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
-                  {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
-                  {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
-                  {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
-                </div>
+              <div className="mobile-card-meta">
+                {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
+                {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
+                {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
+                {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
               </div>
-            </div>
-            <div className="mobile-card-progress">
-              <span className="live-time">{fmtTime(currentTime)}</span>
-              <input
-                className="progress-slider"
-                type="range"
-                min={0}
-                max={duration || 100}
-                step={0.1}
-                value={currentTime}
-                onChange={handleSeek}
-                style={{ "--pct": `${progress}%` } as React.CSSProperties}
-              />
-              <span className="live-time">{fmtTime(duration)}</span>
-            </div>
-          </>
-        ) : (
-          <div className="mobile-card-empty">tap a song to begin ♫</div>
-        )}
+            </>
+          ) : (
+            <div className="mobile-card-empty">tap a song to begin ♫</div>
+          )}
+        </div>
+      </div>
+
+      {/* ── MOBILE PROGRESS ROW ───────────────────────────────────── */}
+      <div className="mobile-progress-row">
+        <span className="mobile-progress-label">
+          {currentSong
+            ? `${cleanTitle(currentSong.title)}${cat ? ` [${catLabel(cat)}]` : ""}`
+            : ""}
+        </span>
+        <span className="live-time">{fmtTime(currentTime)}</span>
+        <input
+          className="progress-slider"
+          type="range"
+          min={0}
+          max={duration || 100}
+          step={0.1}
+          value={currentTime}
+          onChange={handleSeek}
+          style={{ "--pct": `${progress}%` } as React.CSSProperties}
+        />
+        <span className="live-time">{fmtTime(duration)}</span>
       </div>
 
       {/* ── MOBILE TRANSPORT ROW ──────────────────────────────────── */}
       <div className="mobile-controls">
         <h1 className="mobile-title-deco">♫⋆｡‧₊˚♪</h1>
-        <button className="transport-btn" onClick={playPrev}>⏮</button>
-        <button className="transport-btn play-pause" onClick={togglePlayPause}>
+        <button className="mobile-transport-btn" onClick={playPrev}>⏮</button>
+        <button className="mobile-transport-btn mobile-play-btn" onClick={togglePlayPause}>
           {isPlaying
             ? <span className="soundbars"><span/><span/><span/><span/></span>
             : "▶"}
         </button>
-        <button className="transport-btn" onClick={playNext}>⏭</button>
+        <button className="mobile-transport-btn" onClick={playNext}>⏭</button>
         <button
-          className={`transport-btn shuffle-btn${shuffle ? " active" : ""}`}
+          className={`mobile-transport-btn${shuffle ? " active" : ""}`}
           onClick={() => setShuffle(s => { shuffleRef.current = !s; return !s; })}
         >⇄</button>
         <input
