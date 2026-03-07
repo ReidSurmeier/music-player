@@ -185,6 +185,8 @@ export default function MusicPlayer() {
   const [duration, setDuration] = useState(0);
   const [allOpen, setAllOpen] = useState(false);
   const [errored, setErrored] = useState<Set<string>>(new Set());
+  const [volume, setVolume] = useState(1);
+  const [shuffle, setShuffle] = useState(false);
 
   // Load songs — no HEAD check, just load all
   useEffect(() => {
@@ -205,6 +207,11 @@ export default function MusicPlayer() {
         );
       });
   }, []);
+
+  // ── Sync volume to audio element ────────────────────────────────
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = volume;
+  }, [volume]);
 
   // ── Web Audio visualizer ─────────────────────────────────────────
   const setupAnalyser = useCallback(() => {
@@ -433,11 +440,17 @@ export default function MusicPlayer() {
   // ── Next / Prev ───────────────────────────────────────────────────
   const playNext = useCallback(() => {
     if (!currentSong || queue.length === 0) return;
-    const idx = queue.findIndex(s => s.yt_id === currentSong.yt_id);
-    const next = queue.slice(idx + 1).find(s => !errored.has(s.yt_id));
-    if (next) playSong(next, queue);
-    else setIsPlaying(false);
-  }, [currentSong, queue, errored, playSong]);
+    if (shuffle) {
+      const available = queue.filter(s => s.yt_id !== currentSong.yt_id && !errored.has(s.yt_id));
+      if (available.length === 0) { setIsPlaying(false); return; }
+      playSong(available[Math.floor(Math.random() * available.length)], queue);
+    } else {
+      const idx = queue.findIndex(s => s.yt_id === currentSong.yt_id);
+      const next = queue.slice(idx + 1).find(s => !errored.has(s.yt_id));
+      if (next) playSong(next, queue);
+      else setIsPlaying(false);
+    }
+  }, [currentSong, queue, errored, playSong, shuffle]);
 
   const playPrev = useCallback(() => {
     if (!currentSong || queue.length === 0) return;
@@ -566,11 +579,7 @@ export default function MusicPlayer() {
       <section className="titleContainer">
         <a href="#"><h1>♫⋆｡‧₊˚♪⊹₊⋆˚♬ ﾟ.</h1></a>
 
-        <button id="toggle-button" onClick={toggleAll}>
-          {allOpen ? "Hide All" : "View All"}
-        </button>
-
-        {/* Transport controls */}
+        {/* Transport controls — left, right after title */}
         <div className="transport">
           <button className="transport-btn" onClick={playPrev} title="Previous (←)">⏮</button>
           <button className="transport-btn play-pause" onClick={togglePlayPause} title="Play/Pause (Space)">
@@ -579,7 +588,33 @@ export default function MusicPlayer() {
               : "▶"}
           </button>
           <button className="transport-btn" onClick={playNext} title="Next (→)">⏭</button>
+          <button
+            className={`transport-btn shuffle-btn${shuffle ? " active" : ""}`}
+            onClick={() => setShuffle(s => !s)}
+            title="Shuffle"
+          >⇄</button>
         </div>
+
+        {/* Volume control */}
+        <div className="volume-control">
+          <span className="volume-icon" onClick={() => setVolume(v => v === 0 ? 1 : 0)}>
+            {volume === 0 ? "🔇" : volume < 0.5 ? "🔈" : "🔊"}
+          </span>
+          <input
+            className="volume-slider"
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={volume}
+            onChange={e => setVolume(Number(e.target.value))}
+            style={{ "--vol": `${volume * 100}%` } as React.CSSProperties}
+          />
+        </div>
+
+        <button id="toggle-button" onClick={toggleAll}>
+          {allOpen ? "Hide All" : "View All"}
+        </button>
 
         {/* Waveform history — slim outlined border */}
         <div style={{
