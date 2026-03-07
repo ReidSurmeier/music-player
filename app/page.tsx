@@ -765,38 +765,41 @@ export default function MusicPlayer() {
         </div>
       </section>
 
-      {/* ── MOBILE NOW PLAYING CARD ───────────────────────────────── */}
-      <div className="mobile-now-card">
-        <div
-          className="mobile-card-pill"
-          style={currentSong ? { background: songGradient(currentSong) } : {}}
-        >
-          {currentSong ? (
-            <>
-              <div className="mobile-card-header">
-                <span className="mobile-drag">⠿</span>
-                <span className="mobile-card-title">{cleanTitle(currentSong.title)}</span>
-              </div>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={currentSong.thumbnail}
-                alt={cleanTitle(currentSong.title)}
-                className="mobile-thumb"
-              />
-              <div className="mobile-card-meta">
-                {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
-                {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
-                {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
-                {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
-              </div>
-            </>
-          ) : (
-            <div className="mobile-card-empty">tap a song to begin ♫</div>
-          )}
-        </div>
+      {/* ── MOBILE NOW PLAYING CARD ─────────────────────────────────
+           Same border-radius: 50% as desktop pill/circle elements.
+           Edge-to-edge, full width, oval shape via CSS.        ── */}
+      <div
+        className="mobile-now-card"
+        style={currentSong ? { background: songGradient(currentSong) } : {}}
+      >
+        {currentSong ? (
+          <>
+            {/* drag handle + bold title — top left of oval */}
+            <div className="mobile-card-header">
+              <span className="mobile-drag">⠿</span>
+              <span className="mobile-card-title">{cleanTitle(currentSong.title)}</span>
+            </div>
+            {/* album art — centered */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={currentSong.thumbnail}
+              alt={cleanTitle(currentSong.title)}
+              className="mobile-thumb"
+            />
+            {/* metadata — below art */}
+            <div className="mobile-card-meta">
+              {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
+              {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
+              {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
+              {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
+            </div>
+          </>
+        ) : (
+          <div className="mobile-card-empty">tap a song to begin ♫</div>
+        )}
       </div>
 
-      {/* ── MOBILE PROGRESS ROW ───────────────────────────────────── */}
+      {/* ── MOBILE PROGRESS ROW — outside the card, on white ─────── */}
       <div className="mobile-progress-row">
         <span className="mobile-progress-label">
           {currentSong
@@ -820,15 +823,15 @@ export default function MusicPlayer() {
       {/* ── MOBILE TRANSPORT ROW ──────────────────────────────────── */}
       <div className="mobile-controls">
         <h1 className="mobile-title-deco">♫⋆｡‧₊˚♪</h1>
-        <button className="mobile-transport-btn" onClick={playPrev}>⏮</button>
-        <button className="mobile-transport-btn mobile-play-btn" onClick={togglePlayPause}>
+        <button className="transport-btn" onClick={playPrev}>⏮</button>
+        <button className="transport-btn play-pause" onClick={togglePlayPause}>
           {isPlaying
             ? <span className="soundbars"><span/><span/><span/><span/></span>
             : "▶"}
         </button>
-        <button className="mobile-transport-btn" onClick={playNext}>⏭</button>
+        <button className="transport-btn" onClick={playNext}>⏭</button>
         <button
-          className={`mobile-transport-btn${shuffle ? " active" : ""}`}
+          className={`transport-btn shuffle-btn${shuffle ? " active" : ""}`}
           onClick={() => setShuffle(s => { shuffleRef.current = !s; return !s; })}
         >⇄</button>
         <input
