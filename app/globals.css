@@ -653,15 +653,5 @@ details.unavailable summary:after {
     border-bottom: 2px dotted #ddd;
     z-index: 1;
   }
-  .category details {
-    padding: 4px 5px 0 6px;
-  }
-  .category details summary {
-    font-size: 0.72rem;
-    white-space: normal;
-    line-height: 1.35;
-  }
-
-  figure { padding: 0; margin: 0 8px; }
-  figcaption { font-size: 0.65rem; }
+  /* details + summary: NO overrides — use desktop styles exactly */
 }
