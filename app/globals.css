@@ -458,153 +458,184 @@ details.unavailable summary:after {
   }
 }
 
-/* ── Mobile visualizer + bottom controls (hidden on desktop) ── */
-.mobile-viz {
-  display: none;
-}
-.mobile-controls {
-  display: none;
-}
+/* ── Mobile now card + transport: hidden on desktop ── */
+.mobile-now-card { display: none; }
+.mobile-controls  { display: none; }
+.mobile-viz       { display: none; }
 
 @media (max-width: 760px) {
-  /* Title bar: compact */
-  .titleContainer {
-    font-size: 0.8rem;
-    padding: 2px 8px;
-    height: 40px;
-    flex-wrap: nowrap;
-    overflow: hidden;
-  }
-  .titleContainer .transport,
-  .titleContainer .live-bar,
-  .titleContainer .nowPlaying,
-  .titleContainer .title-gif,
-  .titleContainer .volume-control,
-  .titleContainer canvas,
-  .titleContainer div[style*="border"] {
-    display: none !important;
-  }
-  h1 { font-size: 14px; }
-  #toggle-button { display: none; }
+  /* ── Hide desktop chrome ── */
+  .titleContainer { display: none !important; }
+  .colorList      { display: none; }
 
-  /* Hide the sidebar on mobile */
-  .colorList { display: none; }
-
-  /* Content becomes full-width, 2 horizontal scrolling rows */
-  .content {
-    position: fixed;
-    top: 40px;
-    left: 0;
-    right: 0;
-    bottom: 110px;
-    margin: 0;
+  /* ── NOW PLAYING CARD — fixed top, 190px ── */
+  .mobile-now-card {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 190px;
+    z-index: 30;
+    padding: 16px 16px 12px;
+    border-radius: 0 0 16px 16px;
+    background: #f0f0f0;
+    transition: background 0.5s ease;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  }
+  .mobile-card-inner {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex: 1;
+    min-height: 0;
     overflow: hidden;
+  }
+  .mobile-thumb {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+    opacity: 0.9;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  }
+  .mobile-card-info {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .mobile-card-title {
+    font-size: 1rem;
+    font-family: 'AUTHENTICSans-90', sans-serif;
+    font-weight: 600;
+    color: rgba(0,0,0,0.78);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.3;
+  }
+  .mobile-card-meta {
+    font-size: 0.68rem;
+    color: rgba(0,0,0,0.5);
+    margin-top: 5px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.45;
+  }
+  .mobile-card-cat {
+    color: rgba(0,0,0,0.35);
+  }
+  .mobile-card-empty {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    font-size: 0.85rem;
+    color: rgba(0,0,0,0.35);
+    letter-spacing: 0.02em;
+  }
+  .mobile-card-progress {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding-top: 8px;
+  }
+  .mobile-card-progress .live-time {
+    font-size: 0.65rem;
+    color: rgba(0,0,0,0.4);
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .mobile-card-progress .progress-slider {
+    flex: 1;
+    max-width: none;
+  }
+
+  /* ── TRANSPORT ROW — fixed below card, 46px ── */
+  .mobile-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    position: fixed;
+    top: 190px;
+    left: 0;
+    right: 0;
+    height: 46px;
+    background: #fff;
+    border-bottom: 1px solid rgba(0,0,0,0.07);
+    padding: 0 14px;
+    z-index: 29;
+  }
+  .mobile-title-deco {
+    font-size: 0.8rem;
+    color: #ccc;
+    margin: 0;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    letter-spacing: 0;
+  }
+  .mobile-controls .volume-slider {
+    width: 70px;
+    flex-shrink: 0;
+  }
+
+  /* ── PLAYLIST COLUMNS — horizontal scroll ── */
+  .content {
+    position: fixed;
+    top: 236px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: 0;
+    overflow-x: scroll;
+    overflow-y: hidden;
   }
 
   #categoryContainer {
     display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
+    flex-direction: row !important;
+    width: max-content !important;
     height: 100%;
+    align-items: stretch;
   }
 
-  /* Each category becomes a horizontal scrolling row */
   .category {
-    flex: 1;
-    width: 100% !important;
-    height: auto !important;
-    min-height: 0;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 12px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    border-bottom: 1px solid rgba(0,0,0,0.06);
+    width: 170px !important;
+    height: 100% !important;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    flex-shrink: 0;
+    border-right: 1px dotted rgba(0,0,0,0.15);
+    padding-bottom: 24px;
+    display: block !important;
   }
   .category h2 {
-    writing-mode: vertical-lr;
-    text-orientation: mixed;
-    font-size: 11px;
-    color: #bbb;
-    flex-shrink: 0;
-    margin: 0 2px 0 0;
-    padding: 0;
-    letter-spacing: 0.5px;
+    font-size: 13px;
+    padding: 6px 6px 3px;
+    position: sticky;
+    top: 0;
+    background: #fff;
+    writing-mode: horizontal-tb;
+    color: #333;
+    border-bottom: 2px dotted #ddd;
+    z-index: 1;
   }
   .category details {
-    flex-shrink: 0;
+    padding: 4px 5px 0 6px;
   }
   .category details summary {
-    font-size: 0.75rem;
-    white-space: nowrap;
+    font-size: 0.72rem;
+    white-space: normal;
+    line-height: 1.35;
   }
 
-  /* Mobile visualizer — centered between rows */
-  .mobile-viz {
-    display: block;
-    position: fixed;
-    top: 40px;
-    left: 0;
-    right: 0;
-    bottom: 110px;
-    width: 100vw;
-    height: auto;
-    background: transparent;
-    pointer-events: none;
-    z-index: 2;
-    opacity: 0.4;
-  }
-
-  /* Mobile bottom controls — 2 rows fixed to bottom */
-  .mobile-controls {
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 110px;
-    background: #fff;
-    border-top: 1px solid #ddd;
-    padding: 8px 12px 10px;
-    z-index: 20;
-    gap: 4px;
-  }
-  .mobile-row1 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .mobile-now-playing {
-    font-family: 'AUTHENTICSans-90', sans-serif;
-    font-size: 0.75rem;
-    color: #999;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex: 1;
-  }
-  .mobile-row2 {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .mobile-row2 .progress-slider { flex: 1; }
-  .mobile-row2 .live-time {
-    font-size: 0.7rem;
-    color: #bbb;
-    white-space: nowrap;
-  }
-
-  figure { padding: 0; margin: 0 12px; }
-  figcaption { font-size: 0.7rem; }
-}
-
-@media (max-width: 499px) {
-  .titleContainer { height: 36px; }
+  figure { padding: 0; margin: 0 8px; }
+  figcaption { font-size: 0.65rem; }
 }

@@ -136,6 +136,19 @@ function pillStyle(song: Song, available: boolean): React.CSSProperties {
   };
 }
 
+function songGradient(song: Song): string {
+  const catId = song.categories?.[0] || "gray";
+  const palette = NC[catId] ?? NC.gray;
+  const hash = hashInt(song.yt_id);
+  const c1 = palette[hash % palette.length];
+  const c2 = palette[(hash >> 4) % palette.length] ?? c1;
+  const isDarkCat = catId === "dark" || catId === "time";
+  if (isDarkCat) {
+    return `linear-gradient(160deg,${hexToPastelHsl(c1,-18)} 0%,${hexToPastelHsl(c2,-20)} 100%)`;
+  }
+  return `linear-gradient(160deg,${hexToPastelHsl(c1)} 0%,${hexToPastelHsl(c2,5)} 100%)`;
+}
+
 function catLabel(id: string) {
   return LABEL_MAP[id] || (id.charAt(0).toUpperCase() + id.slice(1));
 }
@@ -752,42 +765,72 @@ export default function MusicPlayer() {
         </div>
       </section>
 
-      {/* ── MOBILE VISUALIZER ─────────────────────────────────────── */}
-      <canvas
-        ref={mobileVizRef}
-        className="mobile-viz"
-        width={390}
-        height={300}
-      />
+      {/* ── MOBILE NOW PLAYING CARD ───────────────────────────────── */}
+      <div
+        className="mobile-now-card"
+        style={currentSong ? { background: songGradient(currentSong) } : {}}
+      >
+        {currentSong ? (
+          <>
+            <div className="mobile-card-inner">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={currentSong.thumbnail}
+                alt={cleanTitle(currentSong.title)}
+                className="mobile-thumb"
+              />
+              <div className="mobile-card-info">
+                <div className="mobile-card-title">{cleanTitle(currentSong.title)}</div>
+                <div className="mobile-card-meta">
+                  {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
+                  {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
+                  {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
+                  {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
+                </div>
+              </div>
+            </div>
+            <div className="mobile-card-progress">
+              <span className="live-time">{fmtTime(currentTime)}</span>
+              <input
+                className="progress-slider"
+                type="range"
+                min={0}
+                max={duration || 100}
+                step={0.1}
+                value={currentTime}
+                onChange={handleSeek}
+                style={{ "--pct": `${progress}%` } as React.CSSProperties}
+              />
+              <span className="live-time">{fmtTime(duration)}</span>
+            </div>
+          </>
+        ) : (
+          <div className="mobile-card-empty">tap a song to begin ♫</div>
+        )}
+      </div>
 
-      {/* ── MOBILE BOTTOM CONTROLS ────────────────────────────────── */}
+      {/* ── MOBILE TRANSPORT ROW ──────────────────────────────────── */}
       <div className="mobile-controls">
-        <div className="mobile-row1">
-          <button className="transport-btn" onClick={playPrev}>⏮</button>
-          <button className="transport-btn play-pause" onClick={togglePlayPause}>
-            {isPlaying
-              ? <span className="soundbars"><span/><span/><span/><span/></span>
-              : "▶"}
-          </button>
-          <button className="transport-btn" onClick={playNext}>⏭</button>
-          <span className="mobile-now-playing">
-            {currentSong ? cleanTitle(currentSong.title) : "Nothing playing"}
-          </span>
-        </div>
-        <div className="mobile-row2">
-          <span className="live-time">{fmtTime(currentTime)}</span>
-          <input
-            className="progress-slider"
-            type="range"
-            min={0}
-            max={duration || 100}
-            step={0.1}
-            value={currentTime}
-            onChange={handleSeek}
-            style={{ "--pct": `${progress}%` } as React.CSSProperties}
-          />
-          <span className="live-time">{fmtTime(duration)}</span>
-        </div>
+        <h1 className="mobile-title-deco">♫⋆｡‧₊˚♪</h1>
+        <button className="transport-btn" onClick={playPrev}>⏮</button>
+        <button className="transport-btn play-pause" onClick={togglePlayPause}>
+          {isPlaying
+            ? <span className="soundbars"><span/><span/><span/><span/></span>
+            : "▶"}
+        </button>
+        <button className="transport-btn" onClick={playNext}>⏭</button>
+        <button
+          className={`transport-btn shuffle-btn${shuffle ? " active" : ""}`}
+          onClick={() => setShuffle(s => { shuffleRef.current = !s; return !s; })}
+        >⇄</button>
+        <input
+          className="volume-slider"
+          type="range"
+          min={0} max={1} step={0.01}
+          value={volume}
+          onChange={e => setVolume(Number(e.target.value))}
+          style={{ "--vol": `${volume * 100}%` } as React.CSSProperties}
+        />
       </div>
     </>
   );
