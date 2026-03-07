@@ -505,7 +505,7 @@ details.unavailable summary:after {
   }
   .mobile-card-title {
     font-family: 'AUTHENTICSans-90', sans-serif;
-    font-size: 0.82rem;
+    font-size: 0.68rem;
     font-weight: 700;
     color: rgba(0,0,0,0.82);
     white-space: nowrap;
@@ -515,7 +515,7 @@ details.unavailable summary:after {
   }
   .mobile-card-cat { color: rgba(0,0,0,0.38); font-weight: 400; }
   .mobile-card-times {
-    font-size: 0.65rem;
+    font-size: 0.56rem;
     color: rgba(0,0,0,0.45);
     white-space: nowrap;
     flex-shrink: 0;
@@ -536,7 +536,7 @@ details.unavailable summary:after {
   .mobile-now-card figure img {
     width: 100%;
     height: auto;
-    max-height: 110px;
+    max-height: 72px;
     object-fit: cover;
     display: block;
     flex-shrink: 1;
