@@ -806,6 +806,12 @@ export default function MusicPlayer() {
 
       {/* ── MOBILE TRANSPORT ROW ──────────────────────────────────── */}
       <div className="mobile-controls">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://d2w9rnfcy7mm78.cloudfront.net/10483272/original_6c20fd1a010bb5c6e5df5789483d28e8.gif?1611983047?bc=0"
+          alt=""
+          className="mobile-title-gif"
+        />
         <h1 className="mobile-title-deco">♫⋆｡‧₊˚♪</h1>
         <button className="transport-btn play-pause" onClick={togglePlayPause}>
           {isPlaying ? "⏸" : "▶"}

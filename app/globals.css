@@ -581,6 +581,13 @@ details.unavailable summary:after {
     padding: 0 14px;
     z-index: 29;
   }
+  .mobile-title-gif {
+    height: 22px;
+    width: auto;
+    filter: grayscale(1) opacity(0.35);
+    display: block;
+    flex-shrink: 0;
+  }
   .mobile-title-deco {
     font-size: 0.8rem;
     color: #ccc;
