@@ -187,6 +187,7 @@ export default function MusicPlayer() {
   const [errored, setErrored] = useState<Set<string>>(new Set());
   const [volume, setVolume] = useState(1);
   const [shuffle, setShuffle] = useState(false);
+  const shuffleRef = useRef(false);
 
   // Load songs — no HEAD check, just load all
   useEffect(() => {
@@ -440,7 +441,7 @@ export default function MusicPlayer() {
   // ── Next / Prev ───────────────────────────────────────────────────
   const playNext = useCallback(() => {
     if (!currentSong || queue.length === 0) return;
-    if (shuffle) {
+    if (shuffleRef.current) {
       const available = queue.filter(s => s.yt_id !== currentSong.yt_id && !errored.has(s.yt_id));
       if (available.length === 0) { setIsPlaying(false); return; }
       playSong(available[Math.floor(Math.random() * available.length)], queue);
@@ -450,7 +451,7 @@ export default function MusicPlayer() {
       if (next) playSong(next, queue);
       else setIsPlaying(false);
     }
-  }, [currentSong, queue, errored, playSong, shuffle]);
+  }, [currentSong, queue, errored, playSong]);
 
   const playPrev = useCallback(() => {
     if (!currentSong || queue.length === 0) return;
@@ -577,6 +578,14 @@ export default function MusicPlayer() {
 
       {/* ── TITLE BAR ─────────────────────────────────────────────── */}
       <section className="titleContainer">
+        {/* Grayscale gif — left corner */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://d2w9rnfcy7mm78.cloudfront.net/10483272/original_6c20fd1a010bb5c6e5df5789483d28e8.gif?1611983047?bc=0"
+          alt=""
+          className="title-gif"
+        />
+
         <a href="#"><h1>♫⋆｡‧₊˚♪⊹₊⋆˚♬ ﾟ.</h1></a>
 
         {/* Transport controls — left, right after title */}
@@ -590,16 +599,13 @@ export default function MusicPlayer() {
           <button className="transport-btn" onClick={playNext} title="Next (→)">⏭</button>
           <button
             className={`transport-btn shuffle-btn${shuffle ? " active" : ""}`}
-            onClick={() => setShuffle(s => !s)}
+            onClick={() => setShuffle(s => { shuffleRef.current = !s; return !s; })}
             title="Shuffle"
           >⇄</button>
         </div>
 
         {/* Volume control */}
         <div className="volume-control">
-          <span className="volume-icon" onClick={() => setVolume(v => v === 0 ? 1 : 0)}>
-            {volume === 0 ? "🔇" : volume < 0.5 ? "🔈" : "🔊"}
-          </span>
           <input
             className="volume-slider"
             type="range"
@@ -658,13 +664,7 @@ export default function MusicPlayer() {
         ) : (
           <span className="nowPlaying">Nothing playing. Click a song to begin.</span>
         )}
-        {/* Grayscale gif — right side of title bar */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="https://d2w9rnfcy7mm78.cloudfront.net/10483272/original_6c20fd1a010bb5c6e5df5789483d28e8.gif?1611983047?bc=0"
-          alt=""
-          className="title-gif"
-        />
+
       </section>
 
       {/* ── SIDEBAR — master track list ───────────────────────────── */}

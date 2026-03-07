@@ -190,14 +190,13 @@ button {
 .soundbars span:nth-child(3) { animation-duration: 0.70s; animation-delay: 0.25s; }
 .soundbars span:nth-child(4) { animation-duration: 0.90s; animation-delay: 0.08s; }
 
-/* ── Gif in title bar — desaturated ── */
+/* ── Gif in title bar — desaturated, left corner ── */
 .title-gif {
   flex-shrink: 0;
   height: 22px;
   width: auto;
   filter: grayscale(1) opacity(0.35);
   display: block;
-  margin-left: auto;
 }
 
 /* Transport buttons */
@@ -305,13 +304,6 @@ button {
   align-items: center;
   gap: 4px;
   flex-shrink: 0;
-}
-.volume-icon {
-  font-size: 0.75rem;
-  cursor: pointer;
-  width: 16px;
-  text-align: center;
-  user-select: none;
 }
 .volume-slider {
   -webkit-appearance: none;
