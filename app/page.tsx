@@ -773,32 +773,30 @@ export default function MusicPlayer() {
         style={currentSong ? { background: songGradient(currentSong) } : {}}
       >
         {currentSong ? (
-          <>
-            {/* soundbars + title + times */}
-            <div className="mobile-card-header">
-              {isPlaying && <span className="soundbars"><span/><span/><span/><span/></span>}
-              <span className="mobile-card-title">
-                {cleanTitle(currentSong.title)}
-                {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
+          <figure>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={currentSong.thumbnail} alt={cleanTitle(currentSong.title)} />
+            {/* white box: soundbars + title [cat] · times · meta */}
+            <figcaption>
+              <span className="mobile-fig-top">
+                {isPlaying && <span className="soundbars"><span/><span/><span/><span/></span>}
+                <span className="mobile-fig-title">
+                  {cleanTitle(currentSong.title)}
+                  {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
+                </span>
+                <span className="mobile-card-times">
+                  {fmtTime(currentTime)}<span className="mobile-card-sep"> / </span>{fmtTime(duration)}
+                </span>
               </span>
-              <span className="mobile-card-times">
-                {fmtTime(currentTime)}<span className="mobile-card-sep"> / </span>{fmtTime(duration)}
-              </span>
-            </div>
-            {/* album art + white caption — same markup as desktop expanded pill */}
-            <figure>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={currentSong.thumbnail} alt={cleanTitle(currentSong.title)} />
-              <figcaption>
-                {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
-                {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
-                {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
-                {!currentSong.meta?.album && !currentSong.meta?.year && !currentSong.meta?.label && (
-                  <span style={{color:"#999"}}>—</span>
-                )}
-              </figcaption>
-            </figure>
-          </>
+              {(currentSong.meta?.album || currentSong.meta?.year || currentSong.meta?.label) && (
+                <span className="mobile-fig-meta">
+                  {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
+                  {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
+                  {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
+                </span>
+              )}
+            </figcaption>
+          </figure>
         ) : (
           <div className="mobile-card-empty">tap a song to begin ♫</div>
         )}
