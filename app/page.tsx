@@ -765,19 +765,16 @@ export default function MusicPlayer() {
         </div>
       </section>
 
-      {/* ── MOBILE VISUALIZER STRIP — tiny, top of screen ─────────── */}
-      <canvas ref={mobileVizRef} className="mobile-viz" width={390} height={20} />
-
       {/* ── MOBILE NOW PLAYING CARD ─────────────────────────────────
            border-radius: 50% — same as desktop pill elements.
-           Same inner content as an expanded desktop details pill.  ── */}
+           Shows album art + white figcaption, no scrubber.        ── */}
       <div
         className="mobile-now-card"
         style={currentSong ? { background: songGradient(currentSong) } : {}}
       >
         {currentSong ? (
           <>
-            {/* title + times — top of card */}
+            {/* title + times */}
             <div className="mobile-card-header">
               <span className="mobile-card-title">
                 {cleanTitle(currentSong.title)}
@@ -787,7 +784,7 @@ export default function MusicPlayer() {
                 {fmtTime(currentTime)}<span className="mobile-card-sep"> / </span>{fmtTime(duration)}
               </span>
             </div>
-            {/* album art + metadata — same as desktop figure */}
+            {/* album art + white caption — same markup as desktop expanded pill */}
             <figure>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={currentSong.thumbnail} alt={cleanTitle(currentSong.title)} />
@@ -795,19 +792,11 @@ export default function MusicPlayer() {
                 {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
                 {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
                 {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
+                {!currentSong.meta?.album && !currentSong.meta?.year && !currentSong.meta?.label && (
+                  <span style={{color:"#999"}}>—</span>
+                )}
               </figcaption>
             </figure>
-            {/* scrubber */}
-            <input
-              className="progress-slider mobile-card-scrubber"
-              type="range"
-              min={0}
-              max={duration || 100}
-              step={0.1}
-              value={currentTime}
-              onChange={handleSeek}
-              style={{ "--pct": `${progress}%` } as React.CSSProperties}
-            />
           </>
         ) : (
           <div className="mobile-card-empty">tap a song to begin ♫</div>

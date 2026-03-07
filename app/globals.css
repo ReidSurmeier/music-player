@@ -476,38 +476,23 @@ details.unavailable summary:after {
      edge-to-edge. The oval curve creates the
      visual inset effect without explicit margins.
   ══════════════════════════════════════════ */
-  /* ── thin visualizer strip at the very top ── */
-  .mobile-viz {
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    height: 20px;
-    z-index: 31;
-    pointer-events: none;
-    opacity: 0.5;
-    background: transparent;
-  }
-
   .mobile-now-card {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: space-evenly;
     position: fixed;
-    top: 20px;
+    top: 0;
     left: 0;
     right: 0;
-    height: 200px;
+    height: 210px;
     z-index: 30;
     border-radius: 50%;
     padding: 18px 58px 28px;
     background: #eee;
     transition: background 0.5s ease;
     overflow: hidden;
-    gap: 5px;
+    gap: 4px;
   }
   /* title row: track name [cat]  ·  0:05 / 6:50 */
   .mobile-card-header {
@@ -536,40 +521,36 @@ details.unavailable summary:after {
     font-variant-numeric: tabular-nums;
   }
   .mobile-card-sep { opacity: 0.4; }
-  /* album art + figcaption — same markup as desktop, unstyled override */
+  /* album art + white figcaption — same as desktop expanded pill */
   .mobile-now-card figure {
     padding: 0;
     margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
     flex: 1;
     min-height: 0;
     overflow: hidden;
   }
   .mobile-now-card figure img {
-    width: auto;
-    height: 100%;
-    max-height: 80px;
+    width: 100%;
+    height: auto;
+    max-height: 110px;
     object-fit: cover;
     display: block;
+    flex-shrink: 1;
+    min-height: 0;
   }
   .mobile-now-card figcaption {
-    font-size: 0.6rem;
-    color: rgba(0,0,0,0.5);
-    text-align: center;
+    font-size: 0.65rem;
+    background: white;          /* same white box as desktop */
+    padding: 3px 4px;
+    width: 100%;
+    text-align: left;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    width: 100%;
-    background: transparent;
-    padding: 0;
-  }
-  /* scrubber inside the card */
-  .mobile-card-scrubber {
-    max-width: none !important;
-    width: 100%;
+    color: #333;
     flex-shrink: 0;
   }
   .mobile-card-empty {
@@ -579,6 +560,10 @@ details.unavailable summary:after {
     align-self: center;
   }
 
+  /* ── Suppress pill expansion on mobile — just play, don't expand ── */
+  .category details[open] > figure { display: none !important; }
+  .category details[open] > summary { border-bottom: 1px dotted black; }
+
   /* ── TRANSPORT ROW — directly below oval card ── */
   .mobile-controls {
     display: flex;
@@ -586,7 +571,7 @@ details.unavailable summary:after {
     align-items: center;
     gap: 6px;
     position: fixed;
-    top: 220px;
+    top: 210px;
     left: 0;
     right: 0;
     height: 46px;
@@ -612,7 +597,7 @@ details.unavailable summary:after {
   /* ── PLAYLIST COLUMNS — horizontal scroll, exactly 2 visible ── */
   .content {
     position: fixed;
-    top: 266px;
+    top: 256px;
     left: 0;
     right: 0;
     bottom: 0;
