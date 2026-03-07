@@ -512,11 +512,13 @@ details.unavailable summary:after {
   }
   /* small centered album art */
   .mobile-now-card figure img {
-    width: auto;
-    height: 52px;
+    width: 100%;
+    height: auto;
+    max-height: 120px;
     object-fit: cover;
     display: block;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-height: 0;
   }
   /* white box — title + times on row 1, meta on row 2 */
   .mobile-now-card figcaption {
