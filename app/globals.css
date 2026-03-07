@@ -479,37 +479,32 @@ details.unavailable summary:after {
   .mobile-now-card {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     justify-content: space-evenly;
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    height: 200px;
+    height: 190px;
     z-index: 30;
     border-radius: 50%;          /* ← identical rule to desktop .details */
-    padding: 22px 70px 30px;    /* horizontal padding navigates oval curve */
+    padding: 20px 60px 26px;
     background: #eee;
     transition: background 0.5s ease;
     overflow: hidden;
+    gap: 6px;
   }
-  /* top-left: drag dots + bold title */
+  /* title row: track name [cat]  ·  0:05 / 6:50 */
   .mobile-card-header {
     display: flex;
-    align-items: center;
-    gap: 7px;
+    align-items: baseline;
+    gap: 6px;
     width: 100%;
-  }
-  .mobile-drag {
-    font-size: 0.85rem;
-    color: rgba(0,0,0,0.28);
-    flex-shrink: 0;
-    line-height: 1;
-    letter-spacing: 1px;
+    min-width: 0;
   }
   .mobile-card-title {
     font-family: 'AUTHENTICSans-90', sans-serif;
-    font-size: 0.95rem;
+    font-size: 0.82rem;
     font-weight: 700;
     color: rgba(0,0,0,0.82);
     white-space: nowrap;
@@ -517,79 +512,38 @@ details.unavailable summary:after {
     text-overflow: ellipsis;
     flex: 1;
   }
-  /* album art — centered block */
-  .mobile-thumb {
-    width: 66px;
-    height: 66px;
-    object-fit: cover;
-    display: block;
-    flex-shrink: 0;
-  }
-  /* metadata text — below art, left aligned */
-  .mobile-card-meta {
+  .mobile-card-times {
     font-size: 0.65rem;
-    color: rgba(0,0,0,0.6);
-    line-height: 1.4;
-    width: 100%;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .mobile-card-cat { color: rgba(0,0,0,0.35); }
-  .mobile-card-empty {
-    font-size: 0.85rem;
-    color: rgba(0,0,0,0.35);
-    text-align: center;
-  }
-
-  /* ══════════════════════════════════════════
-     PROGRESS ROW — sits on white below the oval.
-     Track name · elapsed · scrubber · total
-  ══════════════════════════════════════════ */
-  .mobile-progress-row {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    position: fixed;
-    top: 200px;
-    left: 0;
-    right: 0;
-    height: 28px;
-    background: #fff;
-    padding: 0 10px;
-    z-index: 28;
-    border-bottom: 1px solid rgba(218,165,32,0.35);
-  }
-  .mobile-progress-label {
-    font-size: 0.6rem;
-    color: #999;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100px;
-    flex-shrink: 1;
-  }
-  .mobile-progress-row .live-time {
-    font-size: 0.6rem;
-    color: #bbb;
+    color: rgba(0,0,0,0.45);
     white-space: nowrap;
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
   }
-  .mobile-progress-row .progress-slider {
-    flex: 1;
-    max-width: none;
+  .mobile-card-sep { opacity: 0.4; }
+
+  /* visualizer canvas — full card width, clipped by oval overflow */
+  .mobile-viz-canvas {
+    display: block;
+    width: 100%;
+    height: 72px;
+    flex-shrink: 0;
+    opacity: 0.7;
   }
 
-  /* ── TRANSPORT ROW — below progress row ── */
+  /* scrubber inside the card */
+  .mobile-card-scrubber {
+    max-width: none !important;
+    width: 100%;
+  }
+
+  /* ── TRANSPORT ROW — directly below oval card ── */
   .mobile-controls {
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 6px;
     position: fixed;
-    top: 228px;
+    top: 190px;
     left: 0;
     right: 0;
     height: 46px;
@@ -612,10 +566,10 @@ details.unavailable summary:after {
     flex-shrink: 0;
   }
 
-  /* ── PLAYLIST COLUMNS — horizontal scroll ── */
+  /* ── PLAYLIST COLUMNS — horizontal scroll, exactly 2 visible ── */
   .content {
     position: fixed;
-    top: 274px;
+    top: 236px;
     left: 0;
     right: 0;
     bottom: 0;
@@ -633,7 +587,7 @@ details.unavailable summary:after {
   }
 
   .category {
-    width: 170px !important;
+    width: 50vw !important;
     height: 100% !important;
     overflow-y: scroll;
     overflow-x: hidden;

@@ -560,7 +560,7 @@ export default function MusicPlayer() {
   useEffect(() => {
     const update = () => {
       const c = mobileVizRef.current;
-      if (c) { c.width = window.innerWidth; c.height = window.innerHeight - 40 - 110; }
+      if (c) { c.width = window.innerWidth; c.height = 72; }
     };
     update();
     window.addEventListener("resize", update);
@@ -766,49 +766,32 @@ export default function MusicPlayer() {
       </section>
 
       {/* ── MOBILE NOW PLAYING CARD ─────────────────────────────────
-           Same border-radius: 50% as desktop pill/circle elements.
-           Edge-to-edge, full width, oval shape via CSS.        ── */}
+           border-radius: 50% — same as desktop pill elements.
+           Contains: title+times / visualizer / scrubber          ── */}
       <div
         className="mobile-now-card"
         style={currentSong ? { background: songGradient(currentSong) } : {}}
       >
-        {currentSong ? (
-          <>
-            {/* drag handle + bold title — top left of oval */}
-            <div className="mobile-card-header">
-              <span className="mobile-drag">⠿</span>
-              <span className="mobile-card-title">{cleanTitle(currentSong.title)}</span>
-            </div>
-            {/* album art — centered */}
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={currentSong.thumbnail}
-              alt={cleanTitle(currentSong.title)}
-              className="mobile-thumb"
-            />
-            {/* metadata — below art */}
-            <div className="mobile-card-meta">
-              {currentSong.meta?.album && <span>{currentSong.meta.album}</span>}
-              {currentSong.meta?.year && <span> · {currentSong.meta.year}</span>}
-              {currentSong.meta?.label && <span> · {currentSong.meta.label}</span>}
-              {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
-            </div>
-          </>
-        ) : (
-          <div className="mobile-card-empty">tap a song to begin ♫</div>
-        )}
-      </div>
+        {/* title + category + times */}
+        <div className="mobile-card-header">
+          <span className="mobile-card-title">
+            {currentSong
+              ? `${cleanTitle(currentSong.title)}${cat ? ` [${catLabel(cat)}]` : ""}`
+              : "tap a song to begin ♫"}
+          </span>
+          <span className="mobile-card-times">
+            {fmtTime(currentTime)}
+            <span className="mobile-card-sep"> / </span>
+            {fmtTime(duration)}
+          </span>
+        </div>
 
-      {/* ── MOBILE PROGRESS ROW — outside the card, on white ─────── */}
-      <div className="mobile-progress-row">
-        <span className="mobile-progress-label">
-          {currentSong
-            ? `${cleanTitle(currentSong.title)}${cat ? ` [${catLabel(cat)}]` : ""}`
-            : ""}
-        </span>
-        <span className="live-time">{fmtTime(currentTime)}</span>
+        {/* audio visualizer — full card width, clipped by oval */}
+        <canvas ref={mobileVizRef} className="mobile-viz-canvas" width={390} height={72} />
+
+        {/* scrubber */}
         <input
-          className="progress-slider"
+          className="progress-slider mobile-card-scrubber"
           type="range"
           min={0}
           max={duration || 100}
@@ -817,7 +800,6 @@ export default function MusicPlayer() {
           onChange={handleSeek}
           style={{ "--pct": `${progress}%` } as React.CSSProperties}
         />
-        <span className="live-time">{fmtTime(duration)}</span>
       </div>
 
       {/* ── MOBILE TRANSPORT ROW ──────────────────────────────────── */}
