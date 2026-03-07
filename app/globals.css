@@ -488,19 +488,20 @@ details.unavailable summary:after {
     height: 210px;
     z-index: 30;
     border-radius: 50%;
-    padding: 18px 58px 28px;
+    padding: 30px 80px 36px;
     background: #eee;
     transition: background 0.5s ease;
     overflow: hidden;
     gap: 4px;
   }
-  /* title row: track name [cat]  ·  0:05 / 6:50 */
+  /* title row: soundbars + track name [cat]  ·  0:05 / 6:50 */
   .mobile-card-header {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 6px;
     width: 100%;
     min-width: 0;
+    color: rgba(0,0,0,0.75);  /* soundbars inherit this */
   }
   .mobile-card-title {
     font-family: 'AUTHENTICSans-90', sans-serif;

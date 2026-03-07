@@ -774,8 +774,9 @@ export default function MusicPlayer() {
       >
         {currentSong ? (
           <>
-            {/* title + times */}
+            {/* soundbars + title + times */}
             <div className="mobile-card-header">
+              {isPlaying && <span className="soundbars"><span/><span/><span/><span/></span>}
               <span className="mobile-card-title">
                 {cleanTitle(currentSong.title)}
                 {cat && <span className="mobile-card-cat"> [{catLabel(cat)}]</span>}
@@ -806,13 +807,9 @@ export default function MusicPlayer() {
       {/* ── MOBILE TRANSPORT ROW ──────────────────────────────────── */}
       <div className="mobile-controls">
         <h1 className="mobile-title-deco">♫⋆｡‧₊˚♪</h1>
-        <button className="transport-btn" onClick={playPrev}>⏮</button>
         <button className="transport-btn play-pause" onClick={togglePlayPause}>
-          {isPlaying
-            ? <span className="soundbars"><span/><span/><span/><span/></span>
-            : "▶"}
+          {isPlaying ? "⏸" : "▶"}
         </button>
-        <button className="transport-btn" onClick={playNext}>⏭</button>
         <button
           className={`transport-btn shuffle-btn${shuffle ? " active" : ""}`}
           onClick={() => setShuffle(s => { shuffleRef.current = !s; return !s; })}
