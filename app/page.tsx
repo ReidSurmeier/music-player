@@ -750,6 +750,8 @@ export default function MusicPlayer() {
                         decoding="async"
                         className={`dvd-cover${isActive && isPlaying ? " spinning" : ""}`}
                         onError={(e) => { (e.target as HTMLImageElement).src = song.thumbnail; }}
+                        onMouseEnter={() => { if (isActive && isPlaying) audioRef.current?.pause(); }}
+                        onMouseLeave={() => { if (isActive && audioRef.current?.paused) audioRef.current?.play().catch(() => {}); }}
                       />
                       <figcaption>
                         {song.meta?.album && <span>{song.meta.album}</span>}
