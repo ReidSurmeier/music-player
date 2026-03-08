@@ -744,9 +744,11 @@ export default function MusicPlayer() {
                     <figure>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={song.thumbnail}
+                        src={`/dvd-covers/arena_${song.arena_id}.png`}
                         alt={cleanTitle(song.title)}
                         loading="lazy"
+                        className={`dvd-cover${isActive && isPlaying ? " spinning" : ""}`}
+                        onError={(e) => { (e.target as HTMLImageElement).src = song.thumbnail; }}
                       />
                       <figcaption>
                         {song.meta?.album && <span>{song.meta.album}</span>}
@@ -775,7 +777,12 @@ export default function MusicPlayer() {
         {currentSong ? (
           <figure>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={currentSong.thumbnail} alt={cleanTitle(currentSong.title)} />
+            <img
+              src={`/dvd-covers/arena_${currentSong.arena_id}.png`}
+              alt={cleanTitle(currentSong.title)}
+              className={`dvd-cover${isPlaying ? " spinning" : ""}`}
+              onError={(e) => { (e.target as HTMLImageElement).src = currentSong.thumbnail; }}
+            />
             {/* white box: soundbars + title [cat] · times · meta */}
             <figcaption>
               <span className="mobile-fig-top">

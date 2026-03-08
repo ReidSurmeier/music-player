@@ -647,3 +647,23 @@ details.unavailable summary:after {
   }
   /* details + summary: NO overrides — use desktop styles exactly */
 }
+
+/* ── DVD COVER DISC STYLES ─────────────────────────────────────── */
+.dvd-cover {
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+.dvd-cover.spinning {
+  animation: disc-spin 4s linear infinite;
+}
+
+@keyframes disc-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Pause spin on hover so user can see the cover */
+.dvd-cover.spinning:hover {
+  animation-play-state: paused;
+}

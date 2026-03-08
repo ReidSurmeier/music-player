@@ -40,3 +40,7 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 public/audio/*.part
+arena-refs/
+temp_covers/
+hero-refs/
+gd-ref-analysis/
