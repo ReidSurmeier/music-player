@@ -477,7 +477,7 @@ details.unavailable summary:after {
      visual inset effect without explicit margins.
   ══════════════════════════════════════════ */
   .mobile-now-card {
-    display: flex;
+    display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -492,6 +492,9 @@ details.unavailable summary:after {
     transition: background 0.5s ease;
     overflow: hidden;
     gap: 12px;
+  }
+  .mobile-now-card.active {
+    display: flex;
   }
   .mobile-card-cat   { color: rgba(0,0,0,0.38); font-weight: 400; }
   .mobile-card-times { font-size: 0.56rem; color: rgba(0,0,0,0.5); white-space: nowrap; flex-shrink: 0; font-variant-numeric: tabular-nums; }

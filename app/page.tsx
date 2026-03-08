@@ -774,7 +774,7 @@ export default function MusicPlayer() {
            border-radius: 50% — same as desktop pill elements.
            Shows album art + white figcaption, no scrubber.        ── */}
       <div
-        className="mobile-now-card"
+        className={`mobile-now-card${currentSong ? " active" : ""}`}
         style={currentSong ? { background: songGradient(currentSong) } : {}}
       >
         {currentSong ? (
