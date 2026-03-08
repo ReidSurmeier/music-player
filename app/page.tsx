@@ -744,9 +744,10 @@ export default function MusicPlayer() {
                     <figure>
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src={`/dvd-covers/arena_${song.arena_id}.png`}
+                        src={`/dvd-covers/arena_${song.arena_id}.webp`}
                         alt={cleanTitle(song.title)}
                         loading="lazy"
+                        decoding="async"
                         className={`dvd-cover${isActive && isPlaying ? " spinning" : ""}`}
                         onError={(e) => { (e.target as HTMLImageElement).src = song.thumbnail; }}
                       />
@@ -778,7 +779,7 @@ export default function MusicPlayer() {
           <figure>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={`/dvd-covers/arena_${currentSong.arena_id}.png`}
+              src={`/dvd-covers/arena_${currentSong.arena_id}.webp`}
               alt={cleanTitle(currentSong.title)}
               className={`dvd-cover${isPlaying ? " spinning" : ""}`}
               onError={(e) => { (e.target as HTMLImageElement).src = currentSong.thumbnail; }}

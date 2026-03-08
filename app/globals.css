@@ -512,13 +512,12 @@ details.unavailable summary:after {
   }
   /* small centered album art */
   .mobile-now-card figure img {
-    width: 100%;
-    height: auto;
-    max-height: 120px;
+    width: 120px;
+    height: 120px;
+    aspect-ratio: 1 / 1;
     object-fit: cover;
     display: block;
-    flex-shrink: 1;
-    min-height: 0;
+    flex-shrink: 0;
   }
   /* white box — title + times on row 1, meta on row 2 */
   .mobile-now-card figcaption {
@@ -651,11 +650,13 @@ details.unavailable summary:after {
 /* ── DVD COVER DISC STYLES ─────────────────────────────────────── */
 .dvd-cover {
   border-radius: 50%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
   transition: transform 0.3s ease;
 }
 
 .dvd-cover.spinning {
-  animation: disc-spin 4s linear infinite;
+  animation: disc-spin 12s linear infinite;
 }
 
 @keyframes disc-spin {
