@@ -564,7 +564,31 @@ details.unavailable summary:after {
 
   /* ── Suppress pill expansion on mobile — just play, don't expand ── */
   .category details[open] > figure { display: none !important; }
-  .category details[open] > summary { border-bottom: 1px dotted black; }
+  .category details[open] > summary { border-bottom: none; }
+
+  /* ── MOBILE PILLS: horizontal capsule shape ── */
+  .category details {
+    border-radius: 999px !important;
+    margin: 2px 4px !important;
+    padding: 4px 14px !important;
+    cursor: pointer;
+  }
+  .category details summary {
+    border-bottom: none !important;
+    font-size: 0.68rem;
+    line-height: 1.25;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+    padding: 0;
+  }
+  .category details summary .play-icon {
+    display: none;
+  }
+  .category details.unavailable {
+    opacity: 0.35;
+  }
 
   /* ── TRANSPORT ROW — directly below oval card ── */
   .mobile-controls {
