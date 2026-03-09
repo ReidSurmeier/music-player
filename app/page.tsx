@@ -549,12 +549,10 @@ export default function MusicPlayer() {
     const h = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
       if (e.code === "Space") { e.preventDefault(); togglePlayPause(); }
-      if (e.code === "ArrowRight") playNext();
-      if (e.code === "ArrowLeft") playPrev();
     };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [togglePlayPause, playNext, playPrev]);
+  }, [togglePlayPause]);
 
   // ── Window resize: update mobile viz canvas size ───────────────
   useEffect(() => {
@@ -579,11 +577,10 @@ export default function MusicPlayer() {
         onDurationChange={() => setDuration(audioRef.current?.duration ?? 0)}
         onPlay={() => setIsPlaying(true)}
         onPause={() => setIsPlaying(false)}
-        onEnded={playNext}
+        onEnded={() => setIsPlaying(false)}
         onError={() => {
           if (currentSongRef.current) {
             setErrored(prev => new Set([...prev, currentSongRef.current!.yt_id]));
-            playNext();
           }
         }}
         style={{ display: "none" }}
@@ -603,18 +600,11 @@ export default function MusicPlayer() {
 
         {/* Transport controls — left, right after title */}
         <div className="transport">
-          <button className="transport-btn" onClick={playPrev} title="Previous (←)">⏮</button>
           <button className="transport-btn play-pause" onClick={togglePlayPause} title="Play/Pause (Space)">
             {isPlaying
               ? <span className="soundbars"><span/><span/><span/><span/></span>
               : "▶"}
           </button>
-          <button className="transport-btn" onClick={playNext} title="Next (→)">⏭</button>
-          <button
-            className={`transport-btn shuffle-btn${shuffle ? " active" : ""}`}
-            onClick={() => setShuffle(s => { shuffleRef.current = !s; return !s; })}
-            title="Shuffle"
-          >⇄</button>
         </div>
 
         {/* Volume control */}
@@ -824,10 +814,7 @@ export default function MusicPlayer() {
         <button className="transport-btn play-pause" onClick={togglePlayPause}>
           {isPlaying ? "⏸" : "▶"}
         </button>
-        <button
-          className={`transport-btn shuffle-btn${shuffle ? " active" : ""}`}
-          onClick={() => setShuffle(s => { shuffleRef.current = !s; return !s; })}
-        >⇄</button>
+
         <input
           className="volume-slider"
           type="range"
