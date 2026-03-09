@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+import sys
+print("[sync-arena] DISABLED — sync overwrites curated library. Needs rewrite to add-only mode.")
+sys.exit(0)
 """
 sync-arena.py — Auto-sync Are.na sound__ channel → music player
 
