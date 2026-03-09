@@ -54,7 +54,9 @@ GENRE_MAP = {
     "spiritual_jazz_electronic": [
         "spiritual jazz", "cosmic jazz", "nu jazz", "jazz fusion",
         "modular synth", "avant-garde jazz", "london jazz",
-        "astral", "free jazz", "improvisation"
+        "astral", "free jazz", "improvisation", "jazz guitar",
+        "jazz", "saxophone", "trumpet", "piano trio", "quartet",
+        "modal", "post-bop", "sun ra", "pharoah", "coltrane"
     ],
     "leftfield_electronic": [
         "folktronica", "idm", "glitch", "experimental electronic",
@@ -129,301 +131,260 @@ def classify_genre(title: str, description: str = "") -> str:
 # ── SCRAPERS ────────────────────────────────────────────────────────
 
 def scrape_pitchfork_bna() -> list:
-    """Scrape Pitchfork Best New Albums."""
-    log("Scraping Pitchfork Best New Albums...")
+    """Scrape Pitchfork album reviews via RSS, then fetch each page for artist name."""
+    log("Scraping Pitchfork album reviews (RSS + page titles)...")
     candidates = []
-    html = curl_text("https://pitchfork.com/reviews/best/albums/")
-    if not html:
+    rss = curl_text("https://pitchfork.com/feed/feed-album-reviews/rss")
+    if not rss:
         return candidates
 
-    # Extract album entries from the page
-    # Look for patterns like: Artist - Album Title, rating
-    # Pitchfork BNA page has structured review cards
-    blocks = re.findall(
-        r'<h2[^>]*>([^<]+)</h2>\s*(?:<[^>]+>)*\s*<h2[^>]*>([^<]+)</h2>',
-        html
-    )
-    if not blocks:
-        # Try alternative pattern
-        blocks = re.findall(
-            r'"artistName":"([^"]+)".*?"albumName":"([^"]+)"',
-            html
-        )
+    items = re.findall(r'<item>(.*?)</item>', rss, re.DOTALL)
+    for item in items[:15]:  # Limit to 15 to avoid too many fetches
+        link_m = re.search(r'<link>([^<]+)</link>', item)
+        if not link_m:
+            continue
 
-    for artist, album in blocks[:20]:
-        artist = artist.strip()
-        album = album.strip()
-        if artist and album:
+        link = link_m.group(1).strip()
+
+        # Fetch the review page to get "Artist: Album" from <title>
+        page = curl_text(link)
+        if not page:
+            continue
+
+        title_tag = re.search(r'<title>([^<]+)</title>', page)
+        if not title_tag:
+            continue
+
+        # Format: "Artist: Album Album Review | Pitchfork"
+        raw = title_tag.group(1).strip()
+        raw = re.sub(r'\s*\|?\s*Pitchfork\s*$', '', raw)
+        raw = re.sub(r'\s*Album Review\s*$', '', raw)
+
+        parts = raw.split(": ", 1)
+        if len(parts) == 2:
+            artist = parts[0].strip()
+            album = parts[1].strip()
+        else:
+            continue
+
+        # Get description from RSS item for genre classification
+        desc_m = re.search(r'<description>([^<]+)</description>', item)
+        desc = desc_m.group(1).strip() if desc_m else ""
+
+        if artist and album and len(album) > 1:
             candidates.append({
                 "artist": artist,
                 "album": album,
                 "title": f"{artist} - {album}",
-                "source": "Pitchfork BNA",
-                "rating": "Best New Album",
+                "source": "Pitchfork",
+                "rating": "Album Review",
+                "description": desc,
             })
 
-    log(f"  Found {len(candidates)} Pitchfork BNA candidates")
-    return candidates
+        time.sleep(0.5)  # Be polite
 
-
-def scrape_ra_reviews() -> list:
-    """Scrape Resident Advisor album reviews."""
-    log("Scraping Resident Advisor reviews...")
-    candidates = []
-    html = curl_text("https://ra.co/reviews/albums")
-    if not html:
-        return candidates
-
-    # RA review entries
-    entries = re.findall(
-        r'"title":"([^"]+)".*?"artist":\{"name":"([^"]+)"',
-        html
-    )
-    for album, artist in entries[:20]:
-        candidates.append({
-            "artist": artist.strip(),
-            "album": album.strip(),
-            "title": f"{artist.strip()} - {album.strip()}",
-            "source": "Resident Advisor",
-            "rating": "4.0+",
-        })
-
-    log(f"  Found {len(candidates)} RA candidates")
+    log(f"  Found {len(candidates)} Pitchfork candidates")
     return candidates
 
 
 def scrape_bandcamp_daily() -> list:
-    """Scrape Bandcamp Daily album features."""
-    log("Scraping Bandcamp Daily...")
+    """Scrape Bandcamp Daily via RSS — album reviews and best-of lists."""
+    log("Scraping Bandcamp Daily (RSS)...")
     candidates = []
-    html = curl_text("https://daily.bandcamp.com/best-ambient")
-    html2 = curl_text("https://daily.bandcamp.com/best-electronic")
-    html3 = curl_text("https://daily.bandcamp.com/best-jazz")
+    rss = curl_text("https://daily.bandcamp.com/feed")
+    if not rss:
+        return candidates
 
-    for page in [html, html2, html3]:
-        if not page:
+    items = re.findall(r'<item>(.*?)</item>', rss, re.DOTALL)
+    for item in items[:30]:
+        title_m = re.search(r'<title>([^<]+)</title>', item)
+        cats = re.findall(r'<category>([^<]+)</category>', item)
+        if not title_m:
             continue
-        # Bandcamp daily typically has structured album links
-        entries = re.findall(
-            r'<a[^>]+href="([^"]*)"[^>]*>\s*<[^>]+>\s*([^<]+)\s*</[^>]+>\s*<[^>]+>\s*([^<]+)',
-            page
-        )
-        for _, title, artist in entries[:10]:
-            title = title.strip()
-            artist = artist.strip()
-            if title and artist and len(title) > 3:
-                candidates.append({
-                    "artist": artist,
-                    "album": title,
-                    "title": f"{artist} - {title}",
-                    "source": "Bandcamp Daily",
-                    "rating": "Featured",
-                })
+
+        raw_title = title_m.group(1).strip()
+        cats_lower = [c.lower() for c in cats]
+
+        # Only use "Album of the Day" and "Essential Releases" and specific best-of lists
+        # that match our genres
+        dominated_cats = {"album of the day", "essential releases",
+                          "best ambient", "best electronic", "best jazz",
+                          "best experimental"}
+        if not any(c in dominated_cats for c in cats_lower):
+            continue
+
+        # Parse "Artist, \"Album Title\"" format
+        m = re.match(r'^(.+?),\s*["\u201c](.+?)["\u201d]', raw_title)
+        if m:
+            artist = m.group(1).strip()
+            album = m.group(2).strip()
+            # Skip compilations like "Various Artists"
+            if artist.lower() in ("various artists", "various"):
+                continue
+            candidates.append({
+                "artist": artist,
+                "album": album,
+                "title": f"{artist} - {album}",
+                "source": "Bandcamp Daily",
+                "rating": ", ".join(cats[:2]),
+            })
 
     log(f"  Found {len(candidates)} Bandcamp Daily candidates")
     return candidates
 
 
-def scrape_boomkat() -> list:
-    """Scrape Boomkat recommended releases."""
-    log("Scraping Boomkat recommended...")
-    candidates = []
-    html = curl_text("https://boomkat.com/bestsellers")
-    if not html:
-        return candidates
-
-    entries = re.findall(
-        r'<a[^>]+class="[^"]*product[^"]*"[^>]*>.*?<span[^>]*>([^<]+)</span>.*?<span[^>]*>([^<]+)</span>',
-        html, re.DOTALL
-    )
-    for artist, album in entries[:15]:
-        artist = artist.strip()
-        album = album.strip()
-        if artist and album:
-            candidates.append({
-                "artist": artist,
-                "album": album,
-                "title": f"{artist} - {album}",
-                "source": "Boomkat",
-                "rating": "Bestseller",
-            })
-
-    log(f"  Found {len(candidates)} Boomkat candidates")
-    return candidates
-
-
 def scrape_the_quietus() -> list:
-    """Scrape The Quietus album reviews."""
-    log("Scraping The Quietus...")
+    """Scrape The Quietus via RSS."""
+    log("Scraping The Quietus (RSS)...")
     candidates = []
-    html = curl_text("https://thequietus.com/reviews/")
-    if not html:
+    rss = curl_text("https://thequietus.com/feed")
+    if not rss:
         return candidates
 
-    entries = re.findall(
-        r'<h[23][^>]*>\s*<a[^>]*>([^<]+)</a>\s*</h[23]>',
-        html
-    )
-    for title in entries[:15]:
-        title = title.strip()
-        if " - " in title or " – " in title:
-            parts = re.split(r'\s*[-–]\s*', title, 1)
-            if len(parts) == 2:
-                candidates.append({
-                    "artist": parts[0].strip(),
-                    "album": parts[1].strip(),
-                    "title": title,
-                    "source": "The Quietus",
-                    "rating": "Featured Review",
-                })
+    items = re.findall(r'<item>(.*?)</item>', rss, re.DOTALL)
+    for item in items[:25]:
+        title_m = re.search(r'<title>([^<]+)</title>', item)
+        if not title_m:
+            continue
+        raw = title_m.group(1).strip()
+        # Quietus review format: "Artist – Album"
+        parts = re.split(r'\s*[-–—]\s*', raw, 1)
+        if len(parts) == 2 and len(parts[0]) > 1 and len(parts[1]) > 1:
+            candidates.append({
+                "artist": parts[0].strip(),
+                "album": parts[1].strip(),
+                "title": raw,
+                "source": "The Quietus",
+                "rating": "Review",
+            })
 
     log(f"  Found {len(candidates)} Quietus candidates")
     return candidates
 
 
 def scrape_the_wire() -> list:
-    """Scrape The Wire magazine recommendations."""
-    log("Scraping The Wire...")
+    """Scrape The Wire via RSS."""
+    log("Scraping The Wire (RSS)...")
     candidates = []
-    html = curl_text("https://www.thewire.co.uk/audio/tracks")
-    if not html:
+    rss = curl_text("https://www.thewire.co.uk/rss")
+    if not rss:
         return candidates
 
-    entries = re.findall(
-        r'"artistName":\s*"([^"]+)".*?"title":\s*"([^"]+)"',
-        html
-    )
-    if not entries:
-        entries = re.findall(
-            r'<span class="artist">([^<]+)</span>.*?<span class="title">([^<]+)</span>',
-            html, re.DOTALL
-        )
+    items = re.findall(r'<item>(.*?)</item>', rss, re.DOTALL)
+    for item in items[:30]:
+        title_m = re.search(r'<title>([^<]+)</title>', item)
+        desc_m = re.search(r'<description>([^<]+)</description>', item)
+        if not title_m:
+            continue
+        raw = title_m.group(1).strip()
+        desc = desc_m.group(1).strip() if desc_m else ""
 
-    for artist, album in entries[:15]:
-        candidates.append({
-            "artist": artist.strip(),
-            "album": album.strip(),
-            "title": f"{artist.strip()} - {album.strip()}",
-            "source": "The Wire",
-            "rating": "Featured",
-        })
+        # Wire titles are often "Artist: Album" or just article titles
+        # Skip non-review articles
+        if any(skip in raw.lower() for skip in [
+            "presents", "adventures in sound", "mix:", "wire mix",
+            "playlist:", "against the grain", "below the radar",
+            "premiere:", "read an extract", "unlimited editions",
+            "reviewed", "wire "
+        ]):
+            continue
+
+        parts = re.split(r'\s*[:–—]\s*', raw, 1)
+        if len(parts) == 2 and len(parts[0]) > 1 and len(parts[1]) > 1:
+            candidates.append({
+                "artist": parts[0].strip(),
+                "album": parts[1].strip(),
+                "title": raw,
+                "source": "The Wire",
+                "rating": "Featured",
+            })
 
     log(f"  Found {len(candidates)} Wire candidates")
     return candidates
 
 
 def scrape_fact_magazine() -> list:
-    """Scrape FACT Magazine album reviews."""
-    log("Scraping FACT Magazine...")
+    """Scrape FACT Magazine via RSS."""
+    log("Scraping FACT Magazine (RSS)...")
     candidates = []
-    html = curl_text("https://www.factmag.com/category/reviews/")
-    if not html:
+    rss = curl_text("https://www.factmag.com/feed/")
+    if not rss:
         return candidates
 
-    entries = re.findall(
-        r'<h[23][^>]*class="[^"]*entry-title[^"]*"[^>]*>\s*<a[^>]*>([^<]+)</a>',
-        html
-    )
-    for title in entries[:15]:
-        title = title.strip()
-        if " – " in title or " - " in title:
-            parts = re.split(r'\s*[-–]\s*', title, 1)
-            if len(parts) == 2:
-                candidates.append({
-                    "artist": parts[0].strip(),
-                    "album": parts[1].strip(),
-                    "title": title,
-                    "source": "FACT Magazine",
-                    "rating": "Review",
-                })
+    items = re.findall(r'<item>(.*?)</item>', rss, re.DOTALL)
+    for item in items[:15]:
+        title_m = re.search(r'<title>([^<]+)</title>', item)
+        if not title_m:
+            continue
+        raw = title_m.group(1).strip()
+        # Clean HTML entities
+        raw = raw.replace("&#8217;", "'").replace("&#038;", "&").replace("&amp;", "&")
+
+        # FACT titles: "Artist's Album title..." — hard to parse
+        # Look for "'s " pattern
+        m = re.match(r"^(.+?)'s\s+(.+?)(?:\s+launches|\s+opens|\s+extended|\s+presents|\s+explores)", raw)
+        if m:
+            candidates.append({
+                "artist": m.group(1).strip(),
+                "album": m.group(2).strip(),
+                "title": raw,
+                "source": "FACT Magazine",
+                "rating": "Featured",
+            })
 
     log(f"  Found {len(candidates)} FACT candidates")
     return candidates
 
 
-def scrape_nts_picks() -> list:
-    """Scrape NTS Radio editorial picks."""
-    log("Scraping NTS Radio picks...")
+def scrape_ra_reviews() -> list:
+    """Scrape Resident Advisor via web search for recent top-rated album reviews."""
+    log("Scraping Resident Advisor (via web search)...")
     candidates = []
-    html = curl_text("https://www.nts.live/editorial")
+
+    # Search for recent RA reviews
+    search_url = "https://www.google.com/search?q=site:ra.co+%22album+review%22+2026&num=10"
+    html = curl_text(search_url)
     if not html:
-        return candidates
+        # Fallback: try RA's GraphQL API
+        try:
+            import json as _json
+            gql = '{"query":"{ reviews(type: ALBUM, first: 10) { edges { node { title artist { name } } } } }"}'
+            req = Request("https://ra.co/graphql", data=gql.encode(),
+                         headers={"User-Agent": "MusicCriticBot/1.0", "Content-Type": "application/json"})
+            with urlopen(req, timeout=10) as r:
+                data = _json.loads(r.read())
+                for edge in data.get("data", {}).get("reviews", {}).get("edges", []):
+                    node = edge["node"]
+                    candidates.append({
+                        "artist": node["artist"]["name"],
+                        "album": node["title"],
+                        "title": f"{node['artist']['name']} - {node['title']}",
+                        "source": "Resident Advisor",
+                        "rating": "Review",
+                    })
+        except Exception:
+            pass
 
-    entries = re.findall(
-        r'"title":"([^"]+)".*?"artist(?:Name)?":"([^"]+)"',
-        html
-    )
-    for album, artist in entries[:15]:
-        candidates.append({
-            "artist": artist.strip(),
-            "album": album.strip(),
-            "title": f"{artist.strip()} - {album.strip()}",
-            "source": "NTS Radio",
-            "rating": "Editorial Pick",
-        })
-
-    log(f"  Found {len(candidates)} NTS candidates")
+    log(f"  Found {len(candidates)} RA candidates")
     return candidates
+
+
+def scrape_nts_picks() -> list:
+    """NTS doesn't have a good album review RSS — skip for now."""
+    log("Scraping NTS Radio... (no reliable RSS, skipping)")
+    return []
 
 
 def scrape_juno_best() -> list:
-    """Scrape Juno Records best sellers / staff picks."""
-    log("Scraping Juno Records...")
-    candidates = []
-    for genre_url in [
-        "https://www.juno.co.uk/bestsellers/deep-house/this-week/",
-        "https://www.juno.co.uk/bestsellers/house/this-week/",
-        "https://www.juno.co.uk/bestsellers/ambient-drone/this-week/",
-    ]:
-        html = curl_text(genre_url)
-        if not html:
-            continue
-        entries = re.findall(
-            r'<a[^>]+class="[^"]*juno-title[^"]*"[^>]*>([^<]+)</a>.*?'
-            r'<a[^>]+class="[^"]*juno-artist[^"]*"[^>]*>([^<]+)</a>',
-            html, re.DOTALL
-        )
-        for album, artist in entries[:5]:
-            candidates.append({
-                "artist": artist.strip(),
-                "album": album.strip(),
-                "title": f"{artist.strip()} - {album.strip()}",
-                "source": "Juno Records",
-                "rating": "Bestseller",
-            })
-        time.sleep(1)
-
-    log(f"  Found {len(candidates)} Juno candidates")
-    return candidates
+    """Juno Records — JS-rendered, skip for now."""
+    log("Scraping Juno Records... (JS-rendered, skipping)")
+    return []
 
 
 def scrape_dj_mag() -> list:
-    """Scrape DJ Mag album reviews."""
-    log("Scraping DJ Mag...")
-    candidates = []
-    html = curl_text("https://djmag.com/reviews/albums")
-    if not html:
-        return candidates
-
-    entries = re.findall(
-        r'<h[23][^>]*>\s*<a[^>]*>([^<]+)</a>\s*</h[23]>',
-        html
-    )
-    for title in entries[:15]:
-        title = title.strip()
-        if " - " in title or " – " in title:
-            parts = re.split(r'\s*[-–]\s*', title, 1)
-            if len(parts) == 2:
-                candidates.append({
-                    "artist": parts[0].strip(),
-                    "album": parts[1].strip(),
-                    "title": title,
-                    "source": "DJ Mag",
-                    "rating": "Review",
-                })
-
-    log(f"  Found {len(candidates)} DJ Mag candidates")
-    return candidates
+    """DJ Mag — JS-rendered, skip for now."""
+    log("Scraping DJ Mag... (JS-rendered, skipping)")
+    return []
 
 
 # ── YOUTUBE SEARCH ──────────────────────────────────────────────────
@@ -606,13 +567,9 @@ def main():
         scrape_pitchfork_bna,
         scrape_ra_reviews,
         scrape_bandcamp_daily,
-        scrape_boomkat,
         scrape_the_quietus,
         scrape_the_wire,
         scrape_fact_magazine,
-        scrape_nts_picks,
-        scrape_juno_best,
-        scrape_dj_mag,
     ]
 
     # Rotate scrapers — use week number to vary
@@ -647,7 +604,7 @@ def main():
 
     # Score candidates by genre relevance to least-represented territory
     for c in filtered:
-        genre = classify_genre(c["title"], "")
+        genre = classify_genre(c["title"], c.get("description", ""))
         c["genre"] = genre
         c["genre_match"] = 1 if genre == target_genre else 0
 
