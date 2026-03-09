@@ -22,7 +22,7 @@ MUSIC_DIR = Path.home() / "Projects/music-player"
 SONGS_JSON = MUSIC_DIR / "public/songs.json"
 AUDIO_DIR  = MUSIC_DIR / "public/audio"
 GEMINI_KEY = "AIzaSyDsmZJrTd59rEoGhliQ1ErvJ2iqKeuQzGA"
-ARENA_SLUG = "sound-dfweaenwiru"
+ARENA_SLUG = "new-sound-x9juol9wfqy"
 BLOCKLIST_JSON = Path(__file__).parent / "blocklist.json"  # songs to never auto-add
 
 CATEGORY_ORDER = [
