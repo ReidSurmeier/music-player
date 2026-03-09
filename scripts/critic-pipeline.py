@@ -503,7 +503,7 @@ def add_to_library(candidate: dict, yt_info: dict, songs: list) -> list:
     """Add album to songs.json and return updated list."""
     yt_id = yt_info["yt_id"]
     title = f"{candidate['artist']} - {candidate['album']}"
-    category = word_count_category(title)
+    category = "zerowords"  # Critic pipeline additions always go in Zero Words row
 
     # Generate a stable arena_id from the yt_id
     arena_id = int(hashlib.md5(yt_id.encode()).hexdigest()[:8], 16)
@@ -549,6 +549,179 @@ def git_commit_push(title: str, source: str):
     log(f"  Committed and pushed: {title}")
 
 
+# ── LIBRARY ANALYSIS ────────────────────────────────────────────────
+
+def extract_library_fingerprint(songs: list) -> dict:
+    """Build a fingerprint of the library — artists, labels, sonic descriptors."""
+    artists = set()
+    labels = set()
+    for s in songs:
+        t = s["title"]
+        if " - " in t:
+            artists.add(t.split(" - ")[0].strip())
+        elif " | " in t:
+            artists.add(t.split(" | ")[0].strip())
+        meta = s.get("meta", {})
+        if meta.get("label"):
+            labels.add(meta["label"])
+
+    # Clean up artist names — remove suffixes
+    clean_artists = set()
+    for a in artists:
+        a = re.sub(r'\s*(feat\.?|ft\.?|A\.K\.A|aka)\s.*', '', a, flags=re.IGNORECASE).strip()
+        a = re.sub(r'\s*\(.*?\)', '', a).strip()
+        a = re.sub(r'\s*\[.*?\]', '', a).strip()
+        if len(a) > 2:
+            clean_artists.add(a)
+
+    return {
+        "artists": clean_artists,
+        "labels": labels,
+        # Sonic descriptors — hand-curated from the actual library
+        "descriptors": [
+            "deep house", "uk garage", "ambient", "downtempo",
+            "spiritual jazz", "experimental electronic", "dub",
+            "trip hop", "folktronica", "minimal", "detroit techno",
+            "sound system", "boiler room", "modular synth",
+        ],
+        # Reference artists for search queries (most representative)
+        "reference_artists": [
+            "Four Tet", "Todd Edwards", "Nala Sinephro", "Soul Capsule",
+            "Kruder & Dorfmeister", "Brian Eno", "Octave One", "Zero 7",
+            "Thievery Corporation", "The Orb", "Flying Lotus",
+        ],
+    }
+
+
+def search_critic_recommendations(fingerprint: dict) -> list:
+    """Search for critic recommendations based on library fingerprint.
+    
+    Strategy: Use web search to find reviews/lists from reputable publications
+    that mention artists similar to what's in the library.
+    """
+    candidates = []
+    seen_titles = set()
+
+    # Pick 3-4 reference artists to search around (rotate weekly)
+    week = int(time.time()) // (7 * 86400)
+    random.seed(week)
+    ref_artists = list(fingerprint["reference_artists"])
+    random.shuffle(ref_artists)
+    search_artists = ref_artists[:4]
+
+    # Also pick 2 descriptors
+    descs = list(fingerprint["descriptors"])
+    random.shuffle(descs)
+    search_descs = descs[:2]
+
+    # Search queries — find critics talking about music like ours
+    queries = []
+    for artist in search_artists:
+        queries.append(f'"{artist}" "if you like" OR "fans of" OR "similar to" OR "recommended" album 2024 OR 2025 OR 2026')
+        queries.append(f'"{artist}" album review site:pitchfork.com OR site:ra.co OR site:thequietus.com OR site:thewire.co.uk')
+    for desc in search_descs:
+        queries.append(f'best {desc} albums 2025 2026 site:pitchfork.com OR site:ra.co OR site:bandcamp.com')
+
+    BRAVE_KEY = "BSAT5A6h4P9Jyhl-TJOQ-l2DgzMfUXF"
+
+    for query in queries[:6]:  # Limit to 6 searches
+        log(f"  Searching: {query[:80]}...")
+        search_url = f"https://api.search.brave.com/res/v1/web/search?q={quote_plus(query)}&count=5"
+        req = Request(search_url, headers={
+            "Accept": "application/json",
+            "X-Subscription-Token": BRAVE_KEY,
+        })
+        try:
+            with urlopen(req, timeout=10) as r:
+                import json as _json
+                data = _json.loads(r.read())
+                results = [(
+                    w.get("title", ""),
+                    w.get("description", ""),
+                    w.get("url", "")
+                ) for w in data.get("web", {}).get("results", [])]
+        except Exception as e:
+            log(f"    Search error: {e}")
+            time.sleep(2)
+            continue
+
+        for title, snippet, url in results[:5]:
+            title = re.sub(r'<[^>]+>', '', title).strip()
+            snippet = re.sub(r'<[^>]+>', '', snippet).strip()
+
+            # Try to extract "Artist - Album" from the result title
+            # Common patterns: "Artist: Album Review", "Artist - Album | Publication"
+            for sep in [": ", " - ", " – ", " — "]:
+                if sep in title:
+                    parts = title.split(sep, 1)
+                    artist_candidate = parts[0].strip()
+                    album_candidate = re.sub(r'\s*(Album Review|Review|\| .*|· .*)$', '', parts[1]).strip()
+
+                    # Skip if it's one of our existing artists
+                    if artist_candidate.lower() in {a.lower() for a in fingerprint["artists"]}:
+                        continue
+
+                    # Skip if too short or looks like a publication name
+                    if len(artist_candidate) < 2 or len(album_candidate) < 2:
+                        continue
+                    skip_names = {
+                        "pitchfork", "ra", "the wire", "the quietus", "bandcamp", "fact",
+                        "reddit", "r/electronicmusic", "r/music", "r/ifyoulikeblank",
+                        "the 100 best", "the 40 best", "the 50 best", "top 55", "best albums",
+                        "edm", "npr", "kcsb", "inverted audio", "tickets", "concerts",
+                        "r/electronicmusic on reddit", "r/music on reddit",
+                    }
+                    if artist_candidate.lower() in skip_names:
+                        continue
+                    # Skip Reddit threads, best-of lists, concert pages, announcements
+                    combined = f"{title} {snippet} {url}".lower()
+                    if any(skip in combined for skip in [
+                        "reddit.com", "reddit", "r/", "concert", "ticket",
+                        "tour dates", "live tour", "best albums of 20",
+                        "best of 20", "top albums", "top 50", "top 100",
+                        "top 55", "announces", "kcsb", "edm.com",
+                        "songkick", "setlist", "festival",
+                    ]):
+                        continue
+                    # Must look like a real album review or recommendation
+                    # Skip if album_candidate contains "KCSB", "FM", "announces", etc.
+                    if any(skip in album_candidate.lower() for skip in [
+                        "kcsb", " fm", "announces", "first album in",
+                    ]):
+                        continue
+
+                    key = f"{artist_candidate}|{album_candidate}".lower()
+                    if key not in seen_titles:
+                        seen_titles.add(key)
+                        # Determine which publication this came from
+                        source = "Web Search"
+                        for pub, domain in [
+                            ("Pitchfork", "pitchfork.com"),
+                            ("Resident Advisor", "ra.co"),
+                            ("The Quietus", "thequietus.com"),
+                            ("The Wire", "thewire.co.uk"),
+                            ("Bandcamp Daily", "bandcamp.com"),
+                        ]:
+                            if domain in url.lower() or domain in title.lower() or domain in snippet.lower():
+                                source = pub
+                                break
+
+                        candidates.append({
+                            "artist": artist_candidate,
+                            "album": album_candidate,
+                            "title": f"{artist_candidate} - {album_candidate}",
+                            "source": source,
+                            "rating": "Critic Recommendation",
+                            "description": snippet[:200],
+                            "search_context": query[:60],
+                        })
+                    break
+
+        time.sleep(2)
+
+    return candidates
+
+
 # ── MAIN ────────────────────────────────────────────────────────────
 
 def main():
@@ -557,37 +730,50 @@ def main():
     songs = load_library()
     log(f"Current library: {len(songs)} tracks")
 
-    log(f"Genre balance: {genre_balance(songs)}")
+    # Build library fingerprint
+    fingerprint = extract_library_fingerprint(songs)
+    log(f"Library artists: {len(fingerprint['artists'])}")
+    log(f"Reference artists for search: {', '.join(fingerprint['reference_artists'][:4])}")
 
-    # Scrape all sources
-    all_candidates = []
+    # PHASE 1: Search for recommendations based on library fingerprint
+    log("\n── Phase 1: Searching for critic recommendations based on your library ──")
+    search_candidates = search_critic_recommendations(fingerprint)
+    log(f"Found {len(search_candidates)} search-based candidates")
+
+    # PHASE 2: Also check RSS feeds for recent reviews that overlap with our sonic world
+    log("\n── Phase 2: Checking RSS feeds for relevant recent reviews ──")
+    rss_candidates = []
     scrapers = [
         scrape_pitchfork_bna,
-        scrape_ra_reviews,
         scrape_bandcamp_daily,
         scrape_the_quietus,
         scrape_the_wire,
-        scrape_fact_magazine,
     ]
-
-    # Rotate scrapers — use week number to vary
-    week = int(time.time()) // (7 * 86400)
-    random.seed(week)
-    random.shuffle(scrapers)
-
-    for scraper in scrapers[:5]:  # Use 5 sources per run
+    for scraper in scrapers:
         try:
             candidates = scraper()
-            all_candidates.extend(candidates)
+            # Filter RSS candidates — only keep ones that have sonic overlap
+            for c in candidates:
+                text = f"{c['title']} {c.get('description', '')}".lower()
+                # Check if any of our descriptors or reference artists appear
+                has_overlap = any(d in text for d in fingerprint["descriptors"])
+                has_artist_ref = any(a.lower() in text for a in fingerprint["reference_artists"])
+                if has_overlap or has_artist_ref:
+                    c["description"] = c.get("description", "")
+                    rss_candidates.append(c)
         except Exception as e:
             log(f"  Scraper error: {e}")
-        time.sleep(2)
+        time.sleep(1)
 
+    log(f"Found {len(rss_candidates)} relevant RSS candidates")
+
+    # Combine
+    all_candidates = search_candidates + rss_candidates
     if not all_candidates:
-        log("No candidates found from any source. Exiting.")
+        log("No candidates found. Exiting.")
         return
 
-    log(f"Total candidates: {len(all_candidates)}")
+    log(f"\nTotal candidates: {len(all_candidates)}")
 
     # Filter: remove albums already in library
     filtered = [
@@ -600,22 +786,29 @@ def main():
         log("All candidates already in library. Exiting.")
         return
 
-    # Classify genre for logging, but don't use it for ranking
+    # Classify genre for logging
     for c in filtered:
         c["genre"] = classify_genre(c["title"], c.get("description", ""))
 
-    # Rank purely by source reputation — trust the critics
+    # Rank by: source reputation + whether it came from a library-based search
     source_rank = {
         "Pitchfork": 5, "Resident Advisor": 5, "The Wire": 4,
-        "Boomkat": 4, "The Quietus": 3, "Bandcamp Daily": 3,
-        "FACT Magazine": 3, "NTS Radio": 3, "DJ Mag": 2, "Juno Records": 2,
+        "The Quietus": 3, "Bandcamp Daily": 3, "FACT Magazine": 3,
+        "Web Search": 2,
     }
-    filtered.sort(key=lambda c: source_rank.get(c["source"], 1), reverse=True)
+    # Search-based candidates get a bonus because they're already contextually relevant
+    for c in filtered:
+        c["score"] = source_rank.get(c["source"], 1)
+        if c.get("search_context"):
+            c["score"] += 3  # Bonus for being found via library-based search
+
+    filtered.sort(key=lambda c: c["score"], reverse=True)
 
     if LIST_ONLY:
         log("\nCandidates (ranked):")
         for i, c in enumerate(filtered[:15]):
-            log(f"  {i+1}. {c['title']} [{c['source']}] genre={c['genre']} match={c['genre_match']}")
+            ctx = f" (via: {c['search_context'][:40]})" if c.get("search_context") else ""
+            log(f"  {i+1}. {c['title']} [{c['source']}, score={c['score']}] genre={c['genre']}{ctx}")
         return
 
     # Try candidates until we find one available on YouTube

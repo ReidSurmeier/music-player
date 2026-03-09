@@ -36,11 +36,11 @@ const CATEGORY_ORDER = [
   "elements","artifact","fabric","time","mid","pale",
   "light","dark","deep","red","yellow","pink","orange",
   "purple","green","blue","brown","white","gray",
-  "threewords","twowords","oneword",
+  "threewords","twowords","oneword","zerowords",
 ];
 
 const LABEL_MAP: Record<string,string> = {
-  threewords:"Three Words", twowords:"Two Words", oneword:"One Word",
+  threewords:"Three Words", twowords:"Two Words", oneword:"One Word", zerowords:"Zero Words",
 };
 
 // ── Actual nagizin.xyz/htmlColorList/ colors, grouped by category.
@@ -69,6 +69,7 @@ const NC: Record<string, string[]> = {
   mid:        ["#66CDAA","#0000CD","#BA55D3","#9370DB","#3CB371","#7B68EE","#00FA9A","#48D1CC","#C71585"],
   nature:     ["#00FFFF","#7FFFD4","#DEB887","#FF7F50","#8FBC8F","#228B22","#7CFC00","#3CB371","#87CEEB"],
   oneword:    ["#00FFFF","#F0FFFF","#F5F5DC","#FFE4C4","#FF7F50","#DC143C","#DCDCDC","#FFD700","#FFFFF0","#F0E68C","#E6E6FA","#FAF0E6","#DA70D6","#C0C0C0","#D2B48C","#40E0D0","#EE82EE"],
+  zerowords:  ["#2C3E50","#34495E","#7F8C8D","#95A5A6","#BDC3C7","#ECF0F1","#1ABC9C","#16A085","#27AE60","#2980B9","#8E44AD","#2C2C54","#474787","#706FD3","#40407A","#D1D8E0"],
   orange:     ["#FF8C00","#FFA500"],
   pale:       ["#EEE8AA","#98FB98","#AFEEEE","#DB7093"],
   people:     ["#F0F8FF","#5F9EA0","#1E90FF","#DCDCDC","#FFDEAD","#4169E1"],

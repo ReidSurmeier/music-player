@@ -719,5 +719,47 @@
       "to": "#aaa",
       "hue": 0
     }
+  },
+  {
+    "arena_id": 3638440523,
+    "title": "The Orb feat. David Gilmour - Metallic Spheres (Part 1)",
+    "yt_id": "m-rb4eSYMA4_pt1",
+    "url": "https://www.youtube.com/watch?v=m-rb4eSYMA4",
+    "description": "Critic pipeline pick. Found via Pitchfork review, searching for The Orb-adjacent albums.",
+    "thumbnail": "https://img.youtube.com/vi/m-rb4eSYMA4/hqdefault.jpg",
+    "categories": [
+      "zerowords"
+    ],
+    "meta": {
+      "album": "Metallic Spheres",
+      "year": "2010",
+      "label": "Columbia"
+    },
+    "gradient": {
+      "from": "#2C3E50",
+      "to": "#7F8C8D",
+      "hue": 200
+    }
+  },
+  {
+    "arena_id": 3638440523,
+    "title": "The Orb feat. David Gilmour - Metallic Spheres (Part 2)",
+    "yt_id": "m-rb4eSYMA4_pt2",
+    "url": "https://www.youtube.com/watch?v=m-rb4eSYMA4",
+    "description": "Critic pipeline pick. Found via Pitchfork review, searching for The Orb-adjacent albums.",
+    "thumbnail": "https://img.youtube.com/vi/m-rb4eSYMA4/hqdefault.jpg",
+    "categories": [
+      "zerowords"
+    ],
+    "meta": {
+      "album": "Metallic Spheres",
+      "year": "2010",
+      "label": "Columbia"
+    },
+    "gradient": {
+      "from": "#2C3E50",
+      "to": "#7F8C8D",
+      "hue": 200
+    }
   }
 ]
