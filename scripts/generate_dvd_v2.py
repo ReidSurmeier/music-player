@@ -15,7 +15,7 @@ OUTPUT_DIR = Path("/mnt/movies/OpenclawOutput/DVD new")
 TEMP_DIR = Path.home() / "Projects/music-player/temp_covers"
 HERO_REF = Path.home() / "Projects/music-player/hero-refs/katamari_disc.jpg"
 NANO_SCRIPT = Path.home() / ".npm-global/lib/node_modules/openclaw/skills/nano-banana-pro/scripts/generate_image.py"
-GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyDsmZJrTd59rEoGhliQ1ErvJ2iqKeuQzGA")
+GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyDQOireh7orAVAowsfPQm7yDKWBmdi5HaE")
 DISCOGS_API = "https://api.discogs.com"
 
 LIMIT = int(sys.argv[1]) if len(sys.argv) > 1 else 999
