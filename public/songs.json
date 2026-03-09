@@ -719,26 +719,5 @@
       "to": "#aaa",
       "hue": 0
     }
-  },
-  {
-    "arena_id": 897565501,
-    "title": "The Daily - Bandcamp Daily",
-    "yt_id": "EnOZHcBODMg",
-    "url": "https://www.youtube.com/watch?v=EnOZHcBODMg",
-    "description": "Added by critic pipeline. Source: Bandcamp Daily (Featured)",
-    "thumbnail": "https://img.youtube.com/vi/EnOZHcBODMg/hqdefault.jpg",
-    "categories": [
-      "threewords"
-    ],
-    "meta": {
-      "album": "Bandcamp Daily",
-      "year": null,
-      "label": "Bandcamp Daily"
-    },
-    "gradient": {
-      "from": "#888",
-      "to": "#aaa",
-      "hue": 88
-    }
   }
 ]
