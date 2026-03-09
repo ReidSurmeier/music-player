@@ -557,9 +557,7 @@ def main():
     songs = load_library()
     log(f"Current library: {len(songs)} tracks")
 
-    # Determine which genre needs more representation
-    target_genre = least_represented_genre(songs)
-    log(f"Least represented genre: {target_genre}")
+    log(f"Genre balance: {genre_balance(songs)}")
 
     # Scrape all sources
     all_candidates = []
@@ -602,19 +600,17 @@ def main():
         log("All candidates already in library. Exiting.")
         return
 
-    # Score candidates by genre relevance to least-represented territory
+    # Classify genre for logging, but don't use it for ranking
     for c in filtered:
-        genre = classify_genre(c["title"], c.get("description", ""))
-        c["genre"] = genre
-        c["genre_match"] = 1 if genre == target_genre else 0
+        c["genre"] = classify_genre(c["title"], c.get("description", ""))
 
-    # Sort: genre match first, then by source reputation
+    # Rank purely by source reputation — trust the critics
     source_rank = {
-        "Pitchfork BNA": 5, "Resident Advisor": 5, "The Wire": 4,
+        "Pitchfork": 5, "Resident Advisor": 5, "The Wire": 4,
         "Boomkat": 4, "The Quietus": 3, "Bandcamp Daily": 3,
         "FACT Magazine": 3, "NTS Radio": 3, "DJ Mag": 2, "Juno Records": 2,
     }
-    filtered.sort(key=lambda c: (c["genre_match"], source_rank.get(c["source"], 1)), reverse=True)
+    filtered.sort(key=lambda c: source_rank.get(c["source"], 1), reverse=True)
 
     if LIST_ONLY:
         log("\nCandidates (ranked):")
