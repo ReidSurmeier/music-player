@@ -761,5 +761,26 @@
       "to": "#7F8C8D",
       "hue": 200
     }
+  },
+  {
+    "arena_id": 1088759502,
+    "title": "Melchior Productions - No Disco Future Album Review",
+    "yt_id": "zarvhiDBocs",
+    "url": "https://www.youtube.com/watch?v=zarvhiDBocs",
+    "description": "Added by critic pipeline. Source: Pitchfork (Critic Recommendation)",
+    "thumbnail": "https://img.youtube.com/vi/zarvhiDBocs/hqdefault.jpg",
+    "categories": [
+      "zerowords"
+    ],
+    "meta": {
+      "album": "No Disco Future Album Review",
+      "year": null,
+      "label": "Pitchfork"
+    },
+    "gradient": {
+      "from": "#888",
+      "to": "#aaa",
+      "hue": 176
+    }
   }
 ]
