@@ -782,5 +782,26 @@
       "to": "#aaa",
       "hue": 176
     }
+  },
+  {
+    "arena_id": 1378835434,
+    "title": "The Orb / David Gilmour - Metallic Spheres Album Review",
+    "yt_id": "iTp0KXwiJ3E",
+    "url": "https://www.youtube.com/watch?v=iTp0KXwiJ3E",
+    "description": "Added by critic pipeline. Source: Pitchfork (Critic Recommendation)",
+    "thumbnail": "https://img.youtube.com/vi/iTp0KXwiJ3E/hqdefault.jpg",
+    "categories": [
+      "zerowords"
+    ],
+    "meta": {
+      "album": "Metallic Spheres Album Review",
+      "year": null,
+      "label": "Pitchfork"
+    },
+    "gradient": {
+      "from": "#888",
+      "to": "#aaa",
+      "hue": 159
+    }
   }
 ]
